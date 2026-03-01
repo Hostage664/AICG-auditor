@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "library_name": "图书馆",
+    "version": "1.0"
+  },
+  "rules": [
+    {
+      "id": "open_time",
+      "name": "开放时间",
+      "category": "开放时间",
+      "severity": "error",
+      "pattern_type": "regex",
+      "pattern": "23[:：]00|23点",
+      "invalid_values": ["23:00", "23点"],
+      "error_message": "开放时间错误，总馆应为22:00闭馆",
+      "suggestion": "请核实最新开放时间"
+    },
+    {
+      "id": "borrow_limit",
+      "name": "借阅数量",
+      "category": "借阅规则",
+      "severity": "error",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d+)\\s*[本册]",
+      "max_value": 20,
+      "error_message": "借阅数量超限，本科生最多20册",
+      "suggestion": "请区分读者类型或更正数量"
+    }
+  ]
+}

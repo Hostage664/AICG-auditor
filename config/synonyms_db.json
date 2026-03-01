@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "dimension": 384
+  },
+  "categories": {
+    "口语化表达": {
+      "description": "过于随意的网络用语",
+      "severity": "warning",
+      "threshold": 0.75,
+      "suggestion": "建议替换为规范表达",
+      "entries": [
+        {"text": "超赞", "type": "口语", "weight": 1.0},
+        {"text": "很棒", "type": "口语", "weight": 0.9},
+        {"text": "亲", "type": "口语", "weight": 0.8},
+        {"text": "哦", "type": "语气词", "weight": 0.6},
+        {"text": "啦", "type": "语气词", "weight": 0.6},
+        {"text": "赶紧来", "type": "催促", "weight": 0.7},
+        {"text": "不要错过", "type": "营销", "weight": 0.6}
+      ]
+    },
+    "敏感词风险": {
+      "description": "合规风险",
+      "severity": "error",
+      "threshold": 0.80,
+      "suggestion": "请删除或修改",
+      "entries": [
+        {"text": "免费下载", "type": "版权风险", "weight": 1.0},
+        {"text": "无偿分享", "type": "版权风险", "weight": 0.9},
+        {"text": "白嫖", "type": "版权风险", "weight": 1.0}
+      ]
+    },
+    "规范表达参考": {
+      "description": "推荐用语",
+      "severity": "info",
+      "threshold": 0.70,
+      "suggestion": "参考使用",
+      "entries": [
+        {"text": "欢迎广大师生使用", "type": "正式", "weight": 1.0},
+        {"text": "图书馆提供学术资源服务", "type": "正式", "weight": 1.0},
+        {"text": "请遵守借阅规则", "type": "正式", "weight": 1.0}
+      ]
+    }
+  }
+}
