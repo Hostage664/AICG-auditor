@@ -367,7 +367,7 @@ class AuditVisualizer:
 </html>"""
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  模块级工具函数
+#  工具函数
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _parse_mc(mc: Dict[str, Any]) -> Dict[str, Any]:
@@ -399,7 +399,7 @@ def _parse_mc(mc: Dict[str, Any]) -> Dict[str, Any]:
         "review_probability": float(mc.get("review_probability", 0.0)),
         "reject_probability": float(mc.get("reject_probability", 0.0)),
 
-        # 阈值：batch_audit 未传时使用 mc_config 默认值
+        # batch_audit 未传时使用 mc_config 默认值
         "pass_threshold":   float(mc.get("pass_threshold",   0.82)),
         "review_threshold": float(mc.get("review_threshold", 0.60)),
     }

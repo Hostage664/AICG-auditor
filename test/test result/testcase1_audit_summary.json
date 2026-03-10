@@ -1,0 +1,454 @@
+{
+  "file": "testcase1.txt",
+  "scores": {
+    "fact_score": 0.0,
+    "brand_score": 0.24377973874409997,
+    "compliance_score": 1.0,
+    "norm_score": 0.49089981705643404
+  },
+  "fact_issues": [
+    {
+      "rule_id": "FC008",
+      "rule_name": "违规词检查-绝对化用语",
+      "severity": "error",
+      "message": "包含绝对化用语，不符合规范要求",
+      "detail": "命中规则 '违规词检查-绝对化用语'"
+    }
+  ],
+  "sem_matches": [
+    {
+      "category": "口语化表达",
+      "sentence": "赶紧来薅羊毛吧",
+      "matched": "薅羊毛",
+      "similarity": 0.8114646673202515,
+      "weight": 1.0,
+      "w_sim": 0.8114646673202515,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "口语化表达",
+      "sentence": "手慢则无",
+      "matched": "手慢无",
+      "similarity": 0.8140408992767334,
+      "weight": 0.9,
+      "w_sim": 0.7326368093490601,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "敏感词风险",
+      "sentence": "相当于白嫖对不对",
+      "matched": "白嫖",
+      "similarity": 0.7245593070983887,
+      "weight": 1.0,
+      "w_sim": 0.7245593070983887,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.6045994162559509,
+      "weight": 1.0,
+      "w_sim": 0.6045994162559509,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5706146955490112,
+      "weight": 0.9,
+      "w_sim": 0.5135532259941101,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5134608745574951,
+      "weight": 1.0,
+      "w_sim": 0.5134608745574951,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "限时福利千万别错过",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.45003455877304077,
+      "weight": 1.0,
+      "w_sim": 0.45003455877304077,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们馆藏超过五千万册图书 全国最多",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.4877762198448181,
+      "weight": 0.9,
+      "w_sim": 0.4389985978603363,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们馆藏超过五千万册图书 全国最多",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.47143784165382385,
+      "weight": 1.0,
+      "w_sim": 0.47143784165382385,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "每天二十四小时不间断开放",
+      "matched": "本馆开放时间如下",
+      "similarity": 0.48451265692710876,
+      "weight": 0.9,
+      "w_sim": 0.4360613912343979,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5940368175506592,
+      "weight": 1.0,
+      "w_sim": 0.5940368175506592,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5301166772842407,
+      "weight": 1.0,
+      "w_sim": 0.5301166772842407,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.48730164766311646,
+      "weight": 1.0,
+      "w_sim": 0.48730164766311646,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5859358310699463,
+      "weight": 1.0,
+      "w_sim": 0.5859358310699463,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5823036432266235,
+      "weight": 0.9,
+      "w_sim": 0.5240732789039612,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.5280790328979492,
+      "weight": 0.9,
+      "w_sim": 0.4752711296081543,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "这个福利只有我们图书馆有",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5300384759902954,
+      "weight": 1.0,
+      "w_sim": 0.5300384759902954,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "这个福利只有我们图书馆有",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.4801413416862488,
+      "weight": 0.9,
+      "w_sim": 0.4321272075176239,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们图书馆的电子资源已经完全破解了Elsevier和Springer的 付费墙",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5504574775695801,
+      "weight": 1.0,
+      "w_sim": 0.5504574775695801,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.49387407302856445,
+      "weight": 1.0,
+      "w_sim": 0.49387407302856445,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.4846312403678894,
+      "weight": 1.0,
+      "w_sim": 0.4846312403678894,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.4756549000740051,
+      "weight": 1.0,
+      "w_sim": 0.4756549000740051,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.4800695776939392,
+      "weight": 1.0,
+      "w_sim": 0.4800695776939392,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.45604947209358215,
+      "weight": 1.0,
+      "w_sim": 0.45604947209358215,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "扫码关注我们公众号",
+      "matched": "欢迎广大师生使用",
+      "similarity": 0.45125964283943176,
+      "weight": 1.0,
+      "w_sim": 0.45125964283943176,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.48105388879776,
+      "weight": 1.0,
+      "w_sim": 0.48105388879776,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "名额有限先到先得",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.45086193084716797,
+      "weight": 1.0,
+      "w_sim": 0.45086193084716797,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.5954357385635376,
+      "weight": 0.9,
+      "w_sim": 0.5358921647071838,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5648088455200195,
+      "weight": 1.0,
+      "w_sim": 0.5648088455200195,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5633549690246582,
+      "weight": 1.0,
+      "w_sim": 0.5633549690246582,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5367861986160278,
+      "weight": 1.0,
+      "w_sim": 0.5367861986160278,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5254360437393188,
+      "weight": 1.0,
+      "w_sim": 0.5254360437393188,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.49137479066848755,
+      "weight": 0.9,
+      "w_sim": 0.4422373116016388,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.521823525428772,
+      "weight": 1.0,
+      "w_sim": 0.521823525428772,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5038325786590576,
+      "weight": 0.9,
+      "w_sim": 0.45344932079315187,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.46292176842689514,
+      "weight": 0.9,
+      "w_sim": 0.41662959158420565,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "超级好消息来啦",
+      "matched": "特此通知",
+      "similarity": 0.47921332716941833,
+      "weight": 1.0,
+      "w_sim": 0.47921332716941833,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.46219849586486816,
+      "weight": 1.0,
+      "w_sim": 0.46219849586486816,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.46876516938209534,
+      "weight": 1.0,
+      "w_sim": 0.46876516938209534,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "根据相关规定",
+      "similarity": 0.45130079984664917,
+      "weight": 0.9,
+      "w_sim": 0.4061707198619843,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.4906426668167114,
+      "weight": 1.0,
+      "w_sim": 0.4906426668167114,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.5444984436035156,
+      "weight": 1.0,
+      "w_sim": 0.5444984436035156,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "提升读者服务体验",
+      "similarity": 0.46223562955856323,
+      "weight": 0.8,
+      "w_sim": 0.3697885036468506,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.45952916145324707,
+      "weight": 1.0,
+      "w_sim": 0.45952916145324707,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.5409474968910217,
+      "weight": 0.9,
+      "w_sim": 0.48685274720191957,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "依据法律法规",
+      "similarity": 0.46965575218200684,
+      "weight": 1.0,
+      "w_sim": 0.46965575218200684,
+      "db_role": "whitelist"
+    }
+  ],
+  "monte_carlo": {
+    "mean": 0.31086054205722335,
+    "median": 0.30841244742607354,
+    "std": 0.09871481112115146,
+    "ci_95": [
+      0.13999692063702784,
+      0.5153050879285563
+    ],
+    "n_simulations": 0,
+    "pass_threshold": 0.82,
+    "review_threshold": 0.6,
+    "pass_probability": 0.0,
+    "review_probability": 0.003,
+    "reject_probability": 0.997,
+    "decision": "建议重写",
+    "action": "REJECT",
+    "reason": "品牌调性分 0.244 < 否决阈值 0.45，内容风格严重不符，建议重写",
+    "trigger": "hard_reject",
+    "score_distribution": {}
+  }
+}

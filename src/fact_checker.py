@@ -2,7 +2,7 @@
 fact_checker.py
 事实核查模块
 规则库字段说明：
-  pattern_type（推荐）或 type（兼容旧版）：regex / regex_number_range / phone_format
+  pattern_type（推荐）或 type（兼容）：regex / regex_number_range / phone_format
 """
 
 import json
@@ -30,7 +30,6 @@ class FactChecker:
     """
     事实核查器：加载 facts_db.json → 预编译正则 → 结构化返回审核结果
     支持三种规则类型：regex / regex_number_range / phone_format
-    字段兼容：'pattern_type' 优先，退而检查旧版 'type' 字段
     """
 
     def __init__(self, db_path: str = 'config/facts_db.json'):
@@ -52,7 +51,7 @@ class FactChecker:
             # ── 兼容 'type' 和 'pattern_type' 两种字段名 ──────────────────
             p_type = (
                 rule.get('pattern_type') or   # 优先使用 pattern_type
-                rule.get('type') or            # 兼容旧版 type 字段
+                rule.get('type') or            # 兼容 type 字段
                 ''
             ).strip()
 
@@ -73,8 +72,6 @@ class FactChecker:
                 )
                 skipped += 1
                 continue
-
-            # 统一写回 pattern_type，消除后续对字段名的歧义
             rule['pattern_type'] = p_type
 
             # 预编译正则

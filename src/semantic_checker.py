@@ -10,13 +10,12 @@ import faiss as _faiss
 from pathlib import Path
 from typing  import Dict, List, Tuple, Optional
 
-# 修改：导入 encode_queries，不再直接调用 get_model().encode()
 from utils.model_utils import encode_queries, build_faiss_index
 from utils.text_utils  import split_sentences, clean_text
 
 logger = logging.getLogger(__name__)
 
-_BLACKLIST_SIM_FLOOR = 0.60   # bge/m3e 中文语义清晰，阈值可恢复正常
+_BLACKLIST_SIM_FLOOR = 0.60
 _WHITELIST_SIM_FLOOR = 0.45
 
 class _DBIndex:
@@ -46,12 +45,11 @@ class _DBIndex:
         for cat_name, entries in self._categories.items():
             texts = [e['text'] for e in entries]
             logger.info(f"[_DBIndex:{db_role}] [{cat_name}] 构建索引: {len(texts)} 条")
-            # passage 端由 build_faiss_index 内部使用 encode_passages 编码
             self._indices[cat_name] = build_faiss_index(texts, self.dimension)
 
     def search(
         self,
-        sent_embs: np.ndarray,   # 已由 encode_queries 处理，shape=(n_sents, dim)
+        sent_embs: np.ndarray,
         sentences: List[str],
         top_k:     int   = 3,
         sim_floor: float = 0.0,
@@ -86,9 +84,6 @@ class _DBIndex:
         return results
 
 class SemanticChecker:
-    """
-    双库语义检测器
-    """
 
     _cache: Dict[str, _DBIndex] = {}
 

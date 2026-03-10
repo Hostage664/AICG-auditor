@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>审核报告 · testcase1</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background: #f0f2f5; color: #2c3e50;
+      padding: 28px 20px; font-size: 14px;
+    }
+    .wrap { max-width: 900px; margin: 0 auto; }
+
+    /* ── 标题 ── */
+    .page-title {
+      font-size: 1.45em; font-weight: 700;
+      color: #1a252f; margin-bottom: 22px;
+    }
+    .page-title em { color: #3498db; font-style: normal; }
+
+    /* ── 卡片 ── */
+    .card {
+      background: #fff; border-radius: 10px;
+      padding: 18px 22px; margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    .card-title {
+      font-size: .95em; font-weight: 600; color: #34495e;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    /* ── 决策徽章 ── */
+    .badge {
+      display: inline-block; padding: 4px 14px;
+      border-radius: 20px; font-weight: 700;
+      font-size: 1em; color: #fff; letter-spacing: .5px;
+    }
+
+    /* ── 摘要 grid ── */
+    .sum-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px 32px;
+    }
+    .sum-row { display: flex; flex-direction: column; gap: 3px; }
+    .sum-key { font-size: .78em; color: #888; }
+    .sum-val { font-size: 1em; font-weight: 600; }
+    .sum-full { grid-column: 1 / -1; }
+
+    /* ── 概率条 ── */
+    .prob-row {
+      display: flex; align-items: center; gap: 10px; margin: 7px 0;
+    }
+    .prob-label { width: 32px; color: #555; font-size: .9em; }
+    .prob-track {
+      flex: 1; height: 14px; background: #ecf0f1;
+      border-radius: 7px; overflow: hidden; position: relative;
+    }
+    .prob-fill {
+      height: 100%; border-radius: 7px;
+      transition: width .5s ease;
+    }
+    .prob-pct {
+      width: 52px; text-align: right;
+      font-size: .9em; font-weight: 700;
+    }
+
+    /* ── 得分数轴 ── */
+    .axis-wrap {
+      position: relative; height: 64px;
+      margin: 18px 0 8px;
+    }
+    /* 背景分区色块 */
+    .axis-bg {
+      position: absolute; top: 24px; height: 16px;
+      border-radius: 3px;
+    }
+    /* 数轴基线 */
+    .axis-line {
+      position: absolute; top: 32px; left: 0; right: 0;
+      height: 2px; background: #ccc;
+    }
+    /* 标记针 */
+    .axis-pin {
+      position: absolute; top: 14px;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px;
+    }
+    .axis-pin .pin-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%; border: 2px solid #fff;
+      box-shadow: 0 0 0 2px currentColor;
+    }
+    .axis-pin .pin-label {
+      font-size: .7em; font-weight: 600;
+      white-space: nowrap; margin-top: 2px;
+    }
+    /* CI 区间线 */
+    .axis-ci {
+      position: absolute; top: 30px; height: 6px;
+      background: rgba(52,152,219,.35);
+      border-radius: 3px;
+    }
+    /* 阈值竖线 */
+    .axis-thr {
+      position: absolute; top: 18px; width: 2px; height: 28px;
+      transform: translateX(-50%);
+    }
+    .axis-thr-label {
+      position: absolute; top: 0;
+      font-size: .68em; font-weight: 600;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    /* 刻度标签 */
+    .axis-tick {
+      position: absolute; top: 50px;
+      font-size: .7em; color: #888;
+      transform: translateX(-50%);
+    }
+
+    /* ── 各维度得分 ── */
+    .score-table { width: 100%; border-collapse: collapse; }
+    .score-table td { padding: 6px 4px; vertical-align: middle; }
+    .score-table td:first-child {
+      width: 120px; color: #777; font-size: .88em;
+    }
+    .score-table td:last-child {
+      width: 52px; text-align: right;
+      font-weight: 700; font-size: .9em;
+    }
+    .score-bar-track {
+      height: 10px; background: #ecf0f1;
+      border-radius: 5px; overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%; border-radius: 5px;
+    }
+
+    /* ── JSON 折叠 ── */
+    details summary {
+      cursor: pointer; color: #3498db;
+      font-size: .88em; user-select: none; padding: 4px 0;
+    }
+    details summary:hover { text-decoration: underline; }
+    .json-pre {
+      background: #1e1e2e; color: #cdd6f4;
+      border-radius: 6px; padding: 14px;
+      font-size: .76em; line-height: 1.6;
+      overflow: auto; max-height: 540px;
+      margin-top: 10px; white-space: pre;
+      font-family: "Cascadia Code","Fira Code","Consolas",monospace;
+    }
+
+    /* ── footer ── */
+    .footer {
+      text-align: center; color: #bbb;
+      font-size: .78em; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page-title">📊 AIGC 内容审核报告 · <em>testcase1</em></h1>
+
+  <!-- ① 决策摘要 -->
+  <div class="card">
+    <div class="card-title">🎯 蒙特卡洛决策摘要</div>
+    <div class="sum-grid">
+
+      <div class="sum-row">
+        <span class="sum-key">最终处置</span>
+        <span class="sum-val">
+          <span class="badge" style="background:#e74c3c;">拒绝</span>
+          &nbsp;<span style="color:#888;font-weight:400;font-size:.9em;">建议重写</span>
+        </span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">均值 / 中位数</span>
+        <span class="sum-val">0.3109 / 0.3084</span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">标准差</span>
+        <span class="sum-val">0.0987</span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">95% 置信区间</span>
+        <span class="sum-val">[0.1400, 0.5153]</span>
+      </div>
+
+      <div class="sum-row sum-full">
+        <span class="sum-key">触发规则</span>
+        <span class="sum-val">hard_reject</span>
+      </div>
+
+      <div class="sum-row sum-full">
+        <span class="sum-key">原因说明</span>
+        <span class="sum-val" style="font-weight:400;color:#555;">品牌调性分 0.244 < 否决阈值 0.45，内容风格严重不符，建议重写</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ② 概率分布 -->
+  <div class="card">
+    <div class="card-title">🎲 三态概率分布</div>
+    
+    <div class="prob-row">
+      <span class="prob-label">通过</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:0.0%;background:#27ae60;"></div>
+      </div>
+      <span class="prob-pct" style="color:#27ae60;">0.0%</span>
+    </div>
+    <div class="prob-row">
+      <span class="prob-label">复审</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:0.3%;background:#f39c12;"></div>
+      </div>
+      <span class="prob-pct" style="color:#f39c12;">0.3%</span>
+    </div>
+    <div class="prob-row">
+      <span class="prob-label">拒绝</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:99.7%;background:#e74c3c;"></div>
+      </div>
+      <span class="prob-pct" style="color:#e74c3c;">99.7%</span>
+    </div>
+  </div>
+
+  <!-- ③ 得分数轴图（核心可视化） -->
+  <div class="card">
+    <div class="card-title">📈 得分分布数轴</div>
+    
+    <div style="position:relative;">
+      <!-- 图例 -->
+      <div style="display:flex;gap:16px;font-size:.78em;color:#666;margin-bottom:6px;">
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:#2980b9;border-radius:50%;margin-right:4px;"></span>均值</span>
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:#8e44ad;border-radius:50%;margin-right:4px;"></span>中位数</span>
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:rgba(52,152,219,.4);margin-right:4px;"></span>95% CI</span>
+        <span><span style="display:inline-block;width:2px;height:10px;
+              background:#27ae60;margin-right:4px;"></span>通过阈值</span>
+        <span><span style="display:inline-block;width:2px;height:10px;
+              background:#f39c12;margin-right:4px;"></span>复审阈值</span>
+      </div>
+      <div class="axis-wrap">
+        <div class="axis-bg" style="left:0;width:60.00%;background:rgba(231,76,60,.15);"></div><div class="axis-bg" style="left:60.00%;width:22.00%;background:rgba(243,156,18,.15);"></div><div class="axis-bg" style="left:82.00%;width:18.00%;background:rgba(39,174,96,.15);"></div>
+        <div class="axis-line"></div>
+        <div class="axis-ci" style="left:14.00%;width:37.53%;"></div>
+        <div class="axis-thr" style="left:82.00%;background:#27ae60;"></div><span class="axis-thr-label" style="left:82.00%;color:#27ae60;top:-14px;">通过 0.82</span><div class="axis-thr" style="left:60.00%;background:#f39c12;"></div><span class="axis-thr-label" style="left:60.00%;color:#f39c12;top:-14px;">复审 0.6</span>
+        <div class="axis-pin" style="left:31.09%;color:#2980b9;">  <div class="pin-dot" style="background:#2980b9;"></div>  <span class="pin-label">均值<br>0.311</span></div><div class="axis-pin" style="left:30.84%;color:#8e44ad;">  <div class="pin-dot" style="background:#8e44ad;"></div>  <span class="pin-label">中位数<br>0.308</span></div>
+        <span class="axis-tick" style="left:0%;">0.0</span><span class="axis-tick" style="left:20%;">0.2</span><span class="axis-tick" style="left:40%;">0.4</span><span class="axis-tick" style="left:60%;">0.6</span><span class="axis-tick" style="left:80%;">0.8</span><span class="axis-tick" style="left:100%;">1.0</span>
+      </div>
+      <div style="margin-top:44px;font-size:.78em;color:#888;">σ = 0.0987 &nbsp;·&nbsp; 95% CI [0.1400, 0.5153]</div>
+    </div>
+  </div>
+
+  <!-- ④ 各维度得分 -->
+  <div class="card">
+    <div class="card-title">📋 各维度得分</div>
+    <table class="score-table">
+      
+    <tr>
+      <td>事实核查</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:0.0%;background:#e74c3c;"></div>
+        </div>
+      </td>
+      <td style="color:#e74c3c;">0.000</td>
+    </tr>
+    <tr>
+      <td>品牌合规</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:24.4%;background:#e74c3c;"></div>
+        </div>
+      </td>
+      <td style="color:#e74c3c;">0.244</td>
+    </tr>
+    <tr>
+      <td>规定合规</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:100.0%;background:#27ae60;"></div>
+        </div>
+      </td>
+      <td style="color:#27ae60;">1.000</td>
+    </tr>
+    <tr>
+      <td>规范表达</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:49.1%;background:#f39c12;"></div>
+        </div>
+      </td>
+      <td style="color:#f39c12;">0.491</td>
+    </tr>
+    </table>
+  </div>
+
+  <!-- ⑤ 原始 JSON -->
+  <div class="card">
+    <div class="card-title">📄 完整审核数据（JSON）</div>
+    <details>
+      <summary>▶ 展开 / 收起原始 JSON</summary>
+      <pre class="json-pre">{
+  "file": "testcase1.txt",
+  "scores": {
+    "fact_score": 0.0,
+    "brand_score": 0.24377973874409997,
+    "compliance_score": 1.0,
+    "norm_score": 0.49089981705643404
+  },
+  "fact_issues": [
+    {
+      "rule_id": "FC008",
+      "rule_name": "违规词检查-绝对化用语",
+      "severity": "error",
+      "message": "包含绝对化用语，不符合规范要求",
+      "detail": "命中规则 '违规词检查-绝对化用语'"
+    }
+  ],
+  "sem_matches": [
+    {
+      "category": "口语化表达",
+      "sentence": "赶紧来薅羊毛吧",
+      "matched": "薅羊毛",
+      "similarity": 0.8114646673202515,
+      "weight": 1.0,
+      "w_sim": 0.8114646673202515,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "口语化表达",
+      "sentence": "手慢则无",
+      "matched": "手慢无",
+      "similarity": 0.8140408992767334,
+      "weight": 0.9,
+      "w_sim": 0.7326368093490601,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "敏感词风险",
+      "sentence": "相当于白嫖对不对",
+      "matched": "白嫖",
+      "similarity": 0.7245593070983887,
+      "weight": 1.0,
+      "w_sim": 0.7245593070983887,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.6045994162559509,
+      "weight": 1.0,
+      "w_sim": 0.6045994162559509,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5706146955490112,
+      "weight": 0.9,
+      "w_sim": 0.5135532259941101,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5134608745574951,
+      "weight": 1.0,
+      "w_sim": 0.5134608745574951,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "限时福利千万别错过",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.45003455877304077,
+      "weight": 1.0,
+      "w_sim": 0.45003455877304077,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们馆藏超过五千万册图书 全国最多",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.4877762198448181,
+      "weight": 0.9,
+      "w_sim": 0.4389985978603363,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们馆藏超过五千万册图书 全国最多",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.47143784165382385,
+      "weight": 1.0,
+      "w_sim": 0.47143784165382385,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "每天二十四小时不间断开放",
+      "matched": "本馆开放时间如下",
+      "similarity": 0.48451265692710876,
+      "weight": 0.9,
+      "w_sim": 0.4360613912343979,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5940368175506592,
+      "weight": 1.0,
+      "w_sim": 0.5940368175506592,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5301166772842407,
+      "weight": 1.0,
+      "w_sim": 0.5301166772842407,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.48730164766311646,
+      "weight": 1.0,
+      "w_sim": 0.48730164766311646,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5859358310699463,
+      "weight": 1.0,
+      "w_sim": 0.5859358310699463,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5823036432266235,
+      "weight": 0.9,
+      "w_sim": 0.5240732789039612,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "买完之后捐给图书馆就行啦",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.5280790328979492,
+      "weight": 0.9,
+      "w_sim": 0.4752711296081543,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "这个福利只有我们图书馆有",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5300384759902954,
+      "weight": 1.0,
+      "w_sim": 0.5300384759902954,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "这个福利只有我们图书馆有",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.4801413416862488,
+      "weight": 0.9,
+      "w_sim": 0.4321272075176239,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "我们图书馆的电子资源已经完全破解了Elsevier和Springer的 付费墙",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5504574775695801,
+      "weight": 1.0,
+      "w_sim": 0.5504574775695801,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.49387407302856445,
+      "weight": 1.0,
+      "w_sim": 0.49387407302856445,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.4846312403678894,
+      "weight": 1.0,
+      "w_sim": 0.4846312403678894,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.4756549000740051,
+      "weight": 1.0,
+      "w_sim": 0.4756549000740051,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.4800695776939392,
+      "weight": 1.0,
+      "w_sim": 0.4800695776939392,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.45604947209358215,
+      "weight": 1.0,
+      "w_sim": 0.45604947209358215,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "扫码关注我们公众号",
+      "matched": "欢迎广大师生使用",
+      "similarity": 0.45125964283943176,
+      "weight": 1.0,
+      "w_sim": 0.45125964283943176,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.48105388879776,
+      "weight": 1.0,
+      "w_sim": 0.48105388879776,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "名额有限先到先得",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.45086193084716797,
+      "weight": 1.0,
+      "w_sim": 0.45086193084716797,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.5954357385635376,
+      "weight": 0.9,
+      "w_sim": 0.5358921647071838,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5648088455200195,
+      "weight": 1.0,
+      "w_sim": 0.5648088455200195,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5633549690246582,
+      "weight": 1.0,
+      "w_sim": 0.5633549690246582,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5367861986160278,
+      "weight": 1.0,
+      "w_sim": 0.5367861986160278,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5254360437393188,
+      "weight": 1.0,
+      "w_sim": 0.5254360437393188,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "以后借多久都没事",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.49137479066848755,
+      "weight": 0.9,
+      "w_sim": 0.4422373116016388,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.521823525428772,
+      "weight": 1.0,
+      "w_sim": 0.521823525428772,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5038325786590576,
+      "weight": 0.9,
+      "w_sim": 0.45344932079315187,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆以后永远不会收任何费用",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.46292176842689514,
+      "weight": 0.9,
+      "w_sim": 0.41662959158420565,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "超级好消息来啦",
+      "matched": "特此通知",
+      "similarity": 0.47921332716941833,
+      "weight": 1.0,
+      "w_sim": 0.47921332716941833,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.46219849586486816,
+      "weight": 1.0,
+      "w_sim": 0.46219849586486816,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.46876516938209534,
+      "weight": 1.0,
+      "w_sim": 0.46876516938209534,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+      "matched": "根据相关规定",
+      "similarity": 0.45130079984664917,
+      "weight": 0.9,
+      "w_sim": 0.4061707198619843,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "所有SCI论文现在都可以免费下载",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.4906426668167114,
+      "weight": 1.0,
+      "w_sim": 0.4906426668167114,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "导师再也不用花钱买文献了",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.5444984436035156,
+      "weight": 1.0,
+      "w_sim": 0.5444984436035156,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "提升读者服务体验",
+      "similarity": 0.46223562955856323,
+      "weight": 0.8,
+      "w_sim": 0.3697885036468506,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "截图转发到五个群就可以参与",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.45952916145324707,
+      "weight": 1.0,
+      "w_sim": 0.45952916145324707,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.5409474968910217,
+      "weight": 0.9,
+      "w_sim": 0.48685274720191957,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "借书超期罚款已经全部取消啦",
+      "matched": "依据法律法规",
+      "similarity": 0.46965575218200684,
+      "weight": 1.0,
+      "w_sim": 0.46965575218200684,
+      "db_role": "whitelist"
+    }
+  ],
+  "monte_carlo": {
+    "mean": 0.31086054205722335,
+    "median": 0.30841244742607354,
+    "std": 0.09871481112115146,
+    "ci_95": [
+      0.13999692063702784,
+      0.5153050879285563
+    ],
+    "n_simulations": 0,
+    "pass_threshold": 0.82,
+    "review_threshold": 0.6,
+    "pass_probability": 0.0,
+    "review_probability": 0.003,
+    "reject_probability": 0.997,
+    "decision": "建议重写",
+    "action": "REJECT",
+    "reason": "品牌调性分 0.244 < 否决阈值 0.45，内容风格严重不符，建议重写",
+    "trigger": "hard_reject",
+    "score_distribution": {}
+  }
+}</pre>
+    </details>
+  </div>
+
+  <div class="footer">
+    生成时间：2026-03-10 16:23:55
+    &nbsp;·&nbsp; library-aigc-auditor
+  </div>
+
+</div>
+</body>
+</html>
