@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "description": "黑名单词库：命中度越高，对应维度得分越低",
+    "version": "1.0",
+    "dimension": 384,
+    "categories": {
+      "口语化表达": "映射到 brand 维度（品牌调性）",
+      "敏感词风险": "映射到 compliance 维度（合规安全）"
+    }
+  },
+  "categories": {
+    "口语化表达": {
+      "description": "口语化、营销化、非正式表达，与图书馆学术严肃风格不符",
+      "severity": "warning",
+      "suggestion": "替换为正式学术用语",
+      "entries": [
+        {"text": "赶紧来",         "type": "催促型口语", "weight": 0.9},
+        {"text": "快来抢",         "type": "催促型口语", "weight": 0.9},
+        {"text": "别错过",         "type": "催促型口语", "weight": 0.8},
+        {"text": "超好用",         "type": "夸张型口语", "weight": 0.7},
+        {"text": "太厉害了",       "type": "夸张型口语", "weight": 0.7},
+        {"text": "绝绝子",         "type": "网络流行语", "weight": 1.0},
+        {"text": "yyds",           "type": "网络流行语", "weight": 1.0},
+        {"text": "不得不说",       "type": "口语化连接词", "weight": 0.6},
+        {"text": "说真的",         "type": "口语化连接词", "weight": 0.6},
+        {"text": "划重点",         "type": "非正式强调", "weight": 0.7},
+        {"text": "干货满满",       "type": "营销型口语", "weight": 0.8},
+        {"text": "福利来袭",       "type": "营销型口语", "weight": 0.9},
+        {"text": "良心推荐",       "type": "营销型口语", "weight": 0.8},
+        {"text": "强烈安利",       "type": "营销型口语", "weight": 0.8},
+        {"text": "手慢无",         "type": "催促型口语", "weight": 0.9},
+        {"text": "薅羊毛",         "type": "网络流行语", "weight": 1.0},
+        {"text": "神操作",         "type": "网络流行语", "weight": 0.8},
+        {"text": "哇塞",           "type": "感叹型口语", "weight": 0.7},
+        {"text": "牛掰",           "type": "感叹型口语", "weight": 0.7},
+        {"text": "超值",           "type": "营销型口语", "weight": 0.7}
+      ]
+    },
+    "敏感词风险": {
+      "description": "暗示绕过版权、免费获取付费资源、诱导违规使用的表达",
+      "severity": "error",
+      "suggestion": "删除或替换，避免版权及合规风险",
+      "entries": [
+        {"text": "免费下载",       "type": "版权风险",   "weight": 1.0},
+        {"text": "无偿分享",       "type": "版权风险",   "weight": 0.9},
+        {"text": "白嫖",           "type": "版权风险",   "weight": 1.0},
+        {"text": "破解版",         "type": "版权风险",   "weight": 1.0},
+        {"text": "盗版资源",       "type": "版权风险",   "weight": 1.0},
+        {"text": "内部资料",       "type": "合规风险",   "weight": 0.9},
+        {"text": "不限量下载",     "type": "版权风险",   "weight": 1.0},
+        {"text": "绕过限制",       "type": "合规风险",   "weight": 1.0},
+        {"text": "批量导出",       "type": "合规风险",   "weight": 0.9},
+        {"text": "一键搞定",       "type": "误导性表达", "weight": 0.8},
+        {"text": "零门槛获取",     "type": "误导性表达", "weight": 0.9},
+        {"text": "无需申请",       "type": "误导性表达", "weight": 0.8},
+        {"text": "无需登录",       "type": "误导性表达", "weight": 0.8},
+        {"text": "秒速响应",       "type": "夸大宣传",   "weight": 0.7},
+        {"text": "随意使用",       "type": "误导性表达", "weight": 0.9},
+        {"text": "不受限制",       "type": "误导性表达", "weight": 0.9},
+        {"text": "无限获取",       "type": "版权风险",   "weight": 1.0},
+        {"text": "账号共享",       "type": "合规风险",   "weight": 1.0},
+        {"text": "转卖资源",       "type": "版权风险",   "weight": 1.0},
+        {"text": "低价倒卖",       "type": "版权风险",   "weight": 1.0}
+      ]
+    }
+  }
+}

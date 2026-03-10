@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>审核报告 · testcase4</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background: #f0f2f5; color: #2c3e50;
+      padding: 28px 20px; font-size: 14px;
+    }
+    .wrap { max-width: 900px; margin: 0 auto; }
+
+    /* ── 标题 ── */
+    .page-title {
+      font-size: 1.45em; font-weight: 700;
+      color: #1a252f; margin-bottom: 22px;
+    }
+    .page-title em { color: #3498db; font-style: normal; }
+
+    /* ── 卡片 ── */
+    .card {
+      background: #fff; border-radius: 10px;
+      padding: 18px 22px; margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    .card-title {
+      font-size: .95em; font-weight: 600; color: #34495e;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    /* ── 决策徽章 ── */
+    .badge {
+      display: inline-block; padding: 4px 14px;
+      border-radius: 20px; font-weight: 700;
+      font-size: 1em; color: #fff; letter-spacing: .5px;
+    }
+
+    /* ── 摘要 grid ── */
+    .sum-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px 32px;
+    }
+    .sum-row { display: flex; flex-direction: column; gap: 3px; }
+    .sum-key { font-size: .78em; color: #888; }
+    .sum-val { font-size: 1em; font-weight: 600; }
+    .sum-full { grid-column: 1 / -1; }
+
+    /* ── 概率条 ── */
+    .prob-row {
+      display: flex; align-items: center; gap: 10px; margin: 7px 0;
+    }
+    .prob-label { width: 32px; color: #555; font-size: .9em; }
+    .prob-track {
+      flex: 1; height: 14px; background: #ecf0f1;
+      border-radius: 7px; overflow: hidden; position: relative;
+    }
+    .prob-fill {
+      height: 100%; border-radius: 7px;
+      transition: width .5s ease;
+    }
+    .prob-pct {
+      width: 52px; text-align: right;
+      font-size: .9em; font-weight: 700;
+    }
+
+    /* ── 得分数轴 ── */
+    .axis-wrap {
+      position: relative; height: 64px;
+      margin: 18px 0 8px;
+    }
+    /* 背景分区色块 */
+    .axis-bg {
+      position: absolute; top: 24px; height: 16px;
+      border-radius: 3px;
+    }
+    /* 数轴基线 */
+    .axis-line {
+      position: absolute; top: 32px; left: 0; right: 0;
+      height: 2px; background: #ccc;
+    }
+    /* 标记针 */
+    .axis-pin {
+      position: absolute; top: 14px;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 2px;
+    }
+    .axis-pin .pin-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%; border: 2px solid #fff;
+      box-shadow: 0 0 0 2px currentColor;
+    }
+    .axis-pin .pin-label {
+      font-size: .7em; font-weight: 600;
+      white-space: nowrap; margin-top: 2px;
+    }
+    /* CI 区间线 */
+    .axis-ci {
+      position: absolute; top: 30px; height: 6px;
+      background: rgba(52,152,219,.35);
+      border-radius: 3px;
+    }
+    /* 阈值竖线 */
+    .axis-thr {
+      position: absolute; top: 18px; width: 2px; height: 28px;
+      transform: translateX(-50%);
+    }
+    .axis-thr-label {
+      position: absolute; top: 0;
+      font-size: .68em; font-weight: 600;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    /* 刻度标签 */
+    .axis-tick {
+      position: absolute; top: 50px;
+      font-size: .7em; color: #888;
+      transform: translateX(-50%);
+    }
+
+    /* ── 各维度得分 ── */
+    .score-table { width: 100%; border-collapse: collapse; }
+    .score-table td { padding: 6px 4px; vertical-align: middle; }
+    .score-table td:first-child {
+      width: 120px; color: #777; font-size: .88em;
+    }
+    .score-table td:last-child {
+      width: 52px; text-align: right;
+      font-weight: 700; font-size: .9em;
+    }
+    .score-bar-track {
+      height: 10px; background: #ecf0f1;
+      border-radius: 5px; overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%; border-radius: 5px;
+    }
+
+    /* ── JSON 折叠 ── */
+    details summary {
+      cursor: pointer; color: #3498db;
+      font-size: .88em; user-select: none; padding: 4px 0;
+    }
+    details summary:hover { text-decoration: underline; }
+    .json-pre {
+      background: #1e1e2e; color: #cdd6f4;
+      border-radius: 6px; padding: 14px;
+      font-size: .76em; line-height: 1.6;
+      overflow: auto; max-height: 540px;
+      margin-top: 10px; white-space: pre;
+      font-family: "Cascadia Code","Fira Code","Consolas",monospace;
+    }
+
+    /* ── footer ── */
+    .footer {
+      text-align: center; color: #bbb;
+      font-size: .78em; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="page-title">📊 AIGC 内容审核报告 · <em>testcase4</em></h1>
+
+  <!-- ① 决策摘要 -->
+  <div class="card">
+    <div class="card-title">🎯 蒙特卡洛决策摘要</div>
+    <div class="sum-grid">
+
+      <div class="sum-row">
+        <span class="sum-key">最终处置</span>
+        <span class="sum-val">
+          <span class="badge" style="background:#27ae60;">通过</span>
+          &nbsp;<span style="color:#888;font-weight:400;font-size:.9em;">建议通过</span>
+        </span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">均值 / 中位数</span>
+        <span class="sum-val">0.9273 / 0.9399</span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">标准差</span>
+        <span class="sum-val">0.0480</span>
+      </div>
+
+      <div class="sum-row">
+        <span class="sum-key">95% 置信区间</span>
+        <span class="sum-val">[0.8164, 0.9802]</span>
+      </div>
+
+      <div class="sum-row sum-full">
+        <span class="sum-key">触发规则</span>
+        <span class="sum-val">probability</span>
+      </div>
+
+      <div class="sum-row sum-full">
+        <span class="sum-key">原因说明</span>
+        <span class="sum-val" style="font-weight:400;color:#555;">均值 0.927 ≥ 通过阈值 0.82</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ② 概率分布 -->
+  <div class="card">
+    <div class="card-title">🎲 三态概率分布</div>
+    
+    <div class="prob-row">
+      <span class="prob-label">通过</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:97.1%;background:#27ae60;"></div>
+      </div>
+      <span class="prob-pct" style="color:#27ae60;">97.1%</span>
+    </div>
+    <div class="prob-row">
+      <span class="prob-label">复审</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:2.9%;background:#f39c12;"></div>
+      </div>
+      <span class="prob-pct" style="color:#f39c12;">2.9%</span>
+    </div>
+    <div class="prob-row">
+      <span class="prob-label">拒绝</span>
+      <div class="prob-track">
+        <div class="prob-fill" style="width:0.0%;background:#e74c3c;"></div>
+      </div>
+      <span class="prob-pct" style="color:#e74c3c;">0.0%</span>
+    </div>
+  </div>
+
+  <!-- ③ 得分数轴图（核心可视化） -->
+  <div class="card">
+    <div class="card-title">📈 得分分布数轴</div>
+    
+    <div style="position:relative;">
+      <!-- 图例 -->
+      <div style="display:flex;gap:16px;font-size:.78em;color:#666;margin-bottom:6px;">
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:#2980b9;border-radius:50%;margin-right:4px;"></span>均值</span>
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:#8e44ad;border-radius:50%;margin-right:4px;"></span>中位数</span>
+        <span><span style="display:inline-block;width:10px;height:10px;
+              background:rgba(52,152,219,.4);margin-right:4px;"></span>95% CI</span>
+        <span><span style="display:inline-block;width:2px;height:10px;
+              background:#27ae60;margin-right:4px;"></span>通过阈值</span>
+        <span><span style="display:inline-block;width:2px;height:10px;
+              background:#f39c12;margin-right:4px;"></span>复审阈值</span>
+      </div>
+      <div class="axis-wrap">
+        <div class="axis-bg" style="left:0;width:60.00%;background:rgba(231,76,60,.15);"></div><div class="axis-bg" style="left:60.00%;width:22.00%;background:rgba(243,156,18,.15);"></div><div class="axis-bg" style="left:82.00%;width:18.00%;background:rgba(39,174,96,.15);"></div>
+        <div class="axis-line"></div>
+        <div class="axis-ci" style="left:81.64%;width:16.38%;"></div>
+        <div class="axis-thr" style="left:82.00%;background:#27ae60;"></div><span class="axis-thr-label" style="left:82.00%;color:#27ae60;top:-14px;">通过 0.82</span><div class="axis-thr" style="left:60.00%;background:#f39c12;"></div><span class="axis-thr-label" style="left:60.00%;color:#f39c12;top:-14px;">复审 0.6</span>
+        <div class="axis-pin" style="left:92.73%;color:#2980b9;">  <div class="pin-dot" style="background:#2980b9;"></div>  <span class="pin-label">均值<br>0.927</span></div><div class="axis-pin" style="left:93.99%;color:#8e44ad;">  <div class="pin-dot" style="background:#8e44ad;"></div>  <span class="pin-label">中位数<br>0.940</span></div>
+        <span class="axis-tick" style="left:0%;">0.0</span><span class="axis-tick" style="left:20%;">0.2</span><span class="axis-tick" style="left:40%;">0.4</span><span class="axis-tick" style="left:60%;">0.6</span><span class="axis-tick" style="left:80%;">0.8</span><span class="axis-tick" style="left:100%;">1.0</span>
+      </div>
+      <div style="margin-top:44px;font-size:.78em;color:#888;">σ = 0.0480 &nbsp;·&nbsp; 95% CI [0.8164, 0.9802]</div>
+    </div>
+  </div>
+
+  <!-- ④ 各维度得分 -->
+  <div class="card">
+    <div class="card-title">📋 各维度得分</div>
+    <table class="score-table">
+      
+    <tr>
+      <td>事实核查</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:100.0%;background:#27ae60;"></div>
+        </div>
+      </td>
+      <td style="color:#27ae60;">1.000</td>
+    </tr>
+    <tr>
+      <td>品牌合规</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:100.0%;background:#27ae60;"></div>
+        </div>
+      </td>
+      <td style="color:#27ae60;">1.000</td>
+    </tr>
+    <tr>
+      <td>规定合规</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:100.0%;background:#27ae60;"></div>
+        </div>
+      </td>
+      <td style="color:#27ae60;">1.000</td>
+    </tr>
+    <tr>
+      <td>规范表达</td>
+      <td>
+        <div class="score-bar-track">
+          <div class="score-bar-fill"
+               style="width:48.7%;background:#f39c12;"></div>
+        </div>
+      </td>
+      <td style="color:#f39c12;">0.487</td>
+    </tr>
+    </table>
+  </div>
+
+  <!-- ⑤ 原始 JSON -->
+  <div class="card">
+    <div class="card-title">📄 完整审核数据（JSON）</div>
+    <details>
+      <summary>▶ 展开 / 收起原始 JSON</summary>
+      <pre class="json-pre">{
+  "file": "testcase4.txt",
+  "scores": {
+    "fact_score": 1.0,
+    "brand_score": 1.0,
+    "compliance_score": 1.0,
+    "norm_score": 0.4872933411743583
+  },
+  "fact_issues": [],
+  "sem_matches": [
+    {
+      "category": "规范表达参考",
+      "sentence": "根据 生成式人工智能服务管理暂行办法 及本单位信息安全管理制度相关要求",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.5081291198730469,
+      "weight": 1.0,
+      "w_sim": 0.5081291198730469,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "根据 生成式人工智能服务管理暂行办法 及本单位信息安全管理制度相关要求",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.4584612548351288,
+      "weight": 1.0,
+      "w_sim": 0.4584612548351288,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "经研究决定",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.4585312008857727,
+      "weight": 1.0,
+      "w_sim": 0.4585312008857727,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.4749302566051483,
+      "weight": 1.0,
+      "w_sim": 0.4749302566051483,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.4748028814792633,
+      "weight": 0.9,
+      "w_sim": 0.427322593331337,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.4690645933151245,
+      "weight": 1.0,
+      "w_sim": 0.4690645933151245,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三 参与部门：技术研发中心、合规风控部、内容安全组需派员全程值守",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.5155004262924194,
+      "weight": 1.0,
+      "w_sim": 0.5155004262924194,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三 参与部门：技术研发中心、合规风控部、内容安全组需派员全程值守",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.4622342884540558,
+      "weight": 1.0,
+      "w_sim": 0.4622342884540558,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.5536929368972778,
+      "weight": 1.0,
+      "w_sim": 0.5536929368972778,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.4816969335079193,
+      "weight": 1.0,
+      "w_sim": 0.4816969335079193,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.46246427297592163,
+      "weight": 1.0,
+      "w_sim": 0.46246427297592163,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "测试期间发现漏检、误检现象须立即记录并上报",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.4810163676738739,
+      "weight": 1.0,
+      "w_sim": 0.4810163676738739,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "测试期间发现漏检、误检现象须立即记录并上报",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.45743948221206665,
+      "weight": 1.0,
+      "w_sim": 0.45743948221206665,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.5350314974784851,
+      "weight": 1.0,
+      "w_sim": 0.5350314974784851,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.4922013282775879,
+      "weight": 1.0,
+      "w_sim": 0.4922013282775879,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.4601384997367859,
+      "weight": 1.0,
+      "w_sim": 0.4601384997367859,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "关于AIGC内容审核系统第三轮压力测试工作的通知 各直属部门、各分支机构： 为进一步强化生成式人工智能服务安全监管能力",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.5109049081802368,
+      "weight": 1.0,
+      "w_sim": 0.5109049081802368,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "关于AIGC内容审核系统第三轮压力测试工作的通知 各直属部门、各分支机构： 为进一步强化生成式人工智能服务安全监管能力",
+      "matched": "为规范管理",
+      "similarity": 0.4845186173915863,
+      "weight": 0.9,
+      "w_sim": 0.4360667556524277,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "关于AIGC内容审核系统第三轮压力测试工作的通知 各直属部门、各分支机构： 为进一步强化生成式人工智能服务安全监管能力",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.4752163589000702,
+      "weight": 0.9,
+      "w_sim": 0.42769472301006317,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "根据 生成式人工智能服务管理暂行办法 及本单位信息安全管理制度相关要求",
+      "matched": "遵守数据库商协议规定",
+      "similarity": 0.5114421844482422,
+      "weight": 1.0,
+      "w_sim": 0.5114421844482422,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "根据 生成式人工智能服务管理暂行办法 及本单位信息安全管理制度相关要求",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.5110057592391968,
+      "weight": 1.0,
+      "w_sim": 0.5110057592391968,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "根据 生成式人工智能服务管理暂行办法 及本单位信息安全管理制度相关要求",
+      "matched": "为规范管理",
+      "similarity": 0.5063681602478027,
+      "weight": 0.9,
+      "w_sim": 0.45573134422302247,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "经研究决定",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.49011939764022827,
+      "weight": 1.0,
+      "w_sim": 0.49011939764022827,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "拟于近期开展AIGC审核工具第三轮全链路压力测试工作",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.4648841321468353,
+      "weight": 1.0,
+      "w_sim": 0.4648841321468353,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "特此通知",
+      "similarity": 0.5477482080459595,
+      "weight": 1.0,
+      "w_sim": 0.5477482080459595,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.5005637407302856,
+      "weight": 1.0,
+      "w_sim": 0.5005637407302856,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "现将有关事项通知如下： 一、测试目标 重点验证系统在高并发场景下对敏感信息、违规内容、潜在风险文本的实时识别准确率与拦截响应速度",
+      "matched": "根据相关规定",
+      "similarity": 0.4832087755203247,
+      "weight": 0.9,
+      "w_sim": 0.43488789796829225,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三 参与部门：技术研发中心、合规风控部、内容安全组需派员全程值守",
+      "matched": "为规范管理",
+      "similarity": 0.5244008302688599,
+      "weight": 0.9,
+      "w_sim": 0.4719607472419739,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三 参与部门：技术研发中心、合规风控部、内容安全组需派员全程值守",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.5217596888542175,
+      "weight": 0.9,
+      "w_sim": 0.4695837199687958,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三 参与部门：技术研发中心、合规风控部、内容安全组需派员全程值守",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.49292683601379395,
+      "weight": 1.0,
+      "w_sim": 0.49292683601379395,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.63094162940979,
+      "weight": 0.9,
+      "w_sim": 0.567847466468811,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.5421456694602966,
+      "weight": 1.0,
+      "w_sim": 0.5421456694602966,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、工作要求 各单位须严格按照测试预案执行",
+      "matched": "根据相关规定",
+      "similarity": 0.5370748043060303,
+      "weight": 0.9,
+      "w_sim": 0.48336732387542725,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "测试期间发现漏检、误检现象须立即记录并上报",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.4803467094898224,
+      "weight": 1.0,
+      "w_sim": 0.4803467094898224,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "测试期间发现漏检、误检现象须立即记录并上报",
+      "matched": "根据相关规定",
+      "similarity": 0.4714924693107605,
+      "weight": 0.9,
+      "w_sim": 0.42434322237968447,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "测试期间发现漏检、误检现象须立即记录并上报",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.4657822251319885,
+      "weight": 0.9,
+      "w_sim": 0.4192040026187897,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "为规范管理",
+      "similarity": 0.47627031803131104,
+      "weight": 0.9,
+      "w_sim": 0.42864328622817993,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "遵守数据库商协议规定",
+      "similarity": 0.4757545292377472,
+      "weight": 1.0,
+      "w_sim": 0.4757545292377472,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "涉及用户隐私的测试样本须按机密级资料管理",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.47117137908935547,
+      "weight": 1.0,
+      "w_sim": 0.47117137908935547,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "特此通知",
+      "matched": "特此通知",
+      "similarity": 0.797318696975708,
+      "weight": 1.0,
+      "w_sim": 0.797318696975708,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "特此通知",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.465509295463562,
+      "weight": 1.0,
+      "w_sim": 0.465509295463562,
+      "db_role": "whitelist"
+    }
+  ],
+  "monte_carlo": {
+    "mean": 0.9273447252746466,
+    "median": 0.9398865916041148,
+    "std": 0.04795363622852869,
+    "ci_95": [
+      0.8163880957913409,
+      0.9802188104007479
+    ],
+    "n_simulations": 0,
+    "pass_threshold": 0.82,
+    "review_threshold": 0.6,
+    "pass_probability": 0.971,
+    "review_probability": 0.029,
+    "reject_probability": 0.0,
+    "decision": "建议通过",
+    "action": "APPROVE",
+    "reason": "均值 0.927 ≥ 通过阈值 0.82",
+    "trigger": "probability",
+    "score_distribution": {}
+  }
+}</pre>
+    </details>
+  </div>
+
+  <div class="footer">
+    生成时间：2026-03-10 13:02:05
+    &nbsp;·&nbsp; library-aigc-auditor
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,166 +1,291 @@
 """
-批量审核主程序 - 支持单文件或文件夹拖拽
+batch_audit.py
+批量审核主程序
+支持：单文件 / 文件夹 两种输入模式
+依赖模块：fact_checker / semantic_checker / monte_carlo / visualizer
+用法：
+    python src/batch_audit.py <文件路径.txt>
+    python src/batch_audit.py <文件夹路径>
 """
 
 import sys
-import os
 import json
-import numpy as np
+import logging
 import configparser
+import traceback
+from datetime import datetime
+from pathlib  import Path
 
-# 路径设置
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.chdir(PROJECT_ROOT)
-sys.path.insert(0, os.path.join(PROJECT_ROOT, 'src'))
+import numpy as np
 
-# 读取配置
-config = configparser.ConfigParser()
-config.read(os.path.join(PROJECT_ROOT, 'config', 'config.ini'), encoding='utf-8')
+# ── 路径初始化（兼容直接运行与启动器调用）────────────────────────────────────
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT / 'src'))
 
-WEIGHTS = np.array([
-    config.getfloat('weights', 'fact'),
-    config.getfloat('weights', 'brand'),
-    config.getfloat('weights', 'compliance'),
-    config.getfloat('weights', 'norm')
-])
+import os
+os.chdir(_PROJECT_ROOT)
 
-MC_CONFIG = {
-    'n_simulations': config.getint('monte_carlo', 'n_simulations'),
-    'perturbation_sigma': config.getfloat('monte_carlo', 'perturbation_sigma'),
-    'random_seed': config.getint('monte_carlo', 'random_seed'),
-    'base_weights': WEIGHTS
-}
-
-PATHS = {
-    'facts_db': config.get('paths', 'facts_db'),
-    'synonyms_db': config.get('paths', 'synonyms_db'),
-    'output_dir': config.get('paths', 'output_dir')
-}
-
-# 导入模块
-from fact_checker import FactChecker
+from fact_checker     import FactChecker
 from semantic_checker import SemanticChecker
-from monte_carlo import MonteCarloAuditor
-from visualizer import plot_audit_distribution, plot_multi_case_comparison
+from monte_carlo      import MonteCarloAuditor
+from visualizer       import AuditVisualizer   # 接入 visualizer
 
+# ── 日志初始化 ────────────────────────────────────────────────────────────────
+logging.basicConfig(
+    level    = logging.INFO,
+    format   = '%(asctime)s [%(levelname)s] %(name)s - %(message)s',
+    handlers = [logging.StreamHandler(sys.stdout)],
+)
+logger = logging.getLogger(__name__)
 
-def audit_single_file(file_path, fact_checker, semantic_checker, mc_auditor):
-    """审核单个文件"""
-    print(f"\n审核文件: {os.path.basename(file_path)}")
-    
-    # 读取文本
-    with open(file_path, 'r', encoding='utf-8') as f:
-        text = f.read()
-    
-    # 执行审核流程
-    fact_score, fact_errors = fact_checker.check(text)
-    semantic_scores, semantic_matches = semantic_checker.check(text)
-    mc_result = mc_auditor.audit(fact_score, semantic_scores[:3])
-    
-    # 生成图表
-    case_name = os.path.splitext(os.path.basename(file_path))[0]
-    vis_path = plot_audit_distribution(
-        scores=mc_result['scores'],
-        case_name=case_name,
-        decision_info={
-            'recommendation': mc_result['decision']['recommendation'],
-            'pass_probability': mc_result['pass_probability']
-        },
-        output_path=os.path.join(PATHS['output_dir'], f"{case_name}_audit.png")
-    )
-    
-    # 返回结果
-    return {
-        'file': file_path,
-        'case_name': case_name,
-        'text_preview': text[:100] + '...' if len(text) > 100 else text,
-        'fact_score': fact_score,
-        'semantic_scores': semantic_scores.tolist(),
-        'monte_carlo': {
-            'mean': float(mc_result['mean']),
-            'median': float(mc_result['median']),
-            'pass_probability': float(mc_result['pass_probability']),
-            'decision': mc_result['decision']['recommendation'],
-            'action': mc_result['decision']['action']
-        },
-        'chart': vis_path
+# ── 配置加载 ──────────────────────────────────────────────────────────────────
+def _load_config() -> dict:
+    """从 config.ini 读取所有配置，返回 {'paths': ..., 'mc_config': ...}"""
+    cfg      = configparser.ConfigParser()
+    cfg_path = _PROJECT_ROOT / 'config' / 'config.ini'
+
+    if not cfg_path.exists():
+        logger.warning(f"[BatchAudit] 未找到 config.ini，使用全部默认值: {cfg_path}")
+    else:
+        cfg.read(str(cfg_path), encoding='utf-8')
+
+    paths = {
+        'facts_db':     _PROJECT_ROOT / cfg.get('paths', 'facts_db',     fallback='config/facts_db.json'),
+        'blacklist_db': _PROJECT_ROOT / cfg.get('paths', 'blacklist_db', fallback='config/blacklist_db.json'),
+        'whitelist_db': _PROJECT_ROOT / cfg.get('paths', 'whitelist_db', fallback='config/whitelist_db.json'),
+        'output_dir':   _PROJECT_ROOT / cfg.get('paths', 'output_dir',  fallback='output'),
+        'log_file':     _PROJECT_ROOT / cfg.get('paths', 'log_file',    fallback='output/audit.log'),
     }
 
+    mc_config = {
+        'base_weights': [
+            cfg.getfloat('monte_carlo', 'weight_fact',       fallback=0.50),
+            cfg.getfloat('monte_carlo', 'weight_brand',      fallback=0.18),
+            cfg.getfloat('monte_carlo', 'weight_compliance', fallback=0.20),
+            cfg.getfloat('monte_carlo', 'weight_norm',       fallback=0.12),
+        ],
+        'perturbation_sigma': cfg.getfloat('monte_carlo', 'perturbation_sigma', fallback=0.05),
+        'weight_bounds': (
+            cfg.getfloat('monte_carlo', 'weight_bound_min', fallback=0.05),
+            cfg.getfloat('monte_carlo', 'weight_bound_max', fallback=0.75),
+        ),
+        'n_simulations':    cfg.getint  ('monte_carlo', 'n_simulations',    fallback=10_000),
+        'pass_threshold':   cfg.getfloat('monte_carlo', 'pass_threshold',   fallback=0.82),
+        'review_threshold': cfg.getfloat('monte_carlo', 'review_threshold', fallback=0.60),
+        'random_seed':      cfg.getint  ('monte_carlo', 'random_seed',      fallback=42),
+        # 硬性否决阈值
+        'single_dim_reject': cfg.getfloat('hard_reject', 'single_dim_reject_threshold', fallback=0.45),
+        'bc_avg_reject':     cfg.getfloat('hard_reject', 'brand_compliance_avg_reject', fallback=0.50),
+        # 硬性复核阈值
+        'fact_review_floor': cfg.getfloat('hard_review', 'fact_score_review_threshold', fallback=0.95),
+        'pass_prob_min':     cfg.getfloat('hard_review', 'pass_prob_min_for_approve',   fallback=0.60),
+    }
 
+    return {'paths': paths, 'mc_config': mc_config}
+
+# ── 单文件审核 ────────────────────────────────────────────────────────────────
+def _audit_single(
+    text:             str,
+    filename:         str,
+    fact_checker:     FactChecker,
+    semantic_checker: SemanticChecker,
+    mc_auditor:       MonteCarloAuditor,
+) -> dict:
+    """对单份文本执行完整审核流程，返回结构化结果"""
+
+    # ① 事实核查
+    fact_score, fact_issues = fact_checker.check(text)
+    logger.info(
+        f"[BatchAudit] 事实得分={fact_score:.3f}  问题数={len(fact_issues)}"
+    )
+
+    # ② 语义检测
+    sem_scores, sem_matches = semantic_checker.check(text)
+    brand_score      = float(sem_scores[0])
+    compliance_score = float(sem_scores[1])
+    norm_score       = float(sem_scores[2])
+    logger.info(
+        f"[BatchAudit] 语义得分: "
+        f"品牌={brand_score:.3f}  合规={compliance_score:.3f}  规范={norm_score:.3f}"
+    )
+
+# ③ 蒙特卡洛综合评分 + 决策
+    mc_result = mc_auditor.audit(fact_score, sem_scores)
+
+    return {
+        'file': filename,
+        'scores': {
+            'fact_score':       fact_score,
+            'brand_score':      brand_score,
+            'compliance_score': compliance_score,
+            'norm_score':       norm_score,
+        },
+        'fact_issues': fact_issues,
+        'sem_matches': sem_matches,
+        'monte_carlo': {
+            # ── 统计量 ────────────────────────────────────────────────────
+            'mean':               float(mc_result['mean']),
+            'median':             float(mc_result.get('median', 0.0)),
+            'std':                float(mc_result.get('std',    0.0)),
+            'ci_95':              mc_result.get('ci_95', [0.0, 1.0]),
+            'n_simulations':      int(mc_result.get('n_simulations', 0)),  # ★ 补齐
+
+            # ── 阈值（visualizer 绘图需要）────────────────────────────────
+            'pass_threshold':     float(mc_result.get('pass_threshold',   0.82)),  # ★ 补齐
+            'review_threshold':   float(mc_result.get('review_threshold', 0.60)),  # ★ 补齐
+
+            # ── 概率 ──────────────────────────────────────────────────────
+            'pass_probability':   float(mc_result['pass_probability']),
+            'review_probability': float(mc_result.get('review_probability', 0.0)),
+            'reject_probability': float(mc_result.get('reject_probability', 0.0)),
+
+            # ── 决策（已解包为字符串）──────────────────────────────────────
+            'decision':           mc_result['decision']['recommendation'],
+            'action':             mc_result['decision']['action'],
+            'reason':             mc_result['decision'].get('reason',  ''),
+            'trigger':            mc_result['decision'].get('trigger', ''),
+
+            # ── 分布数据（visualizer 绘图核心）────────────────────────────
+            'score_distribution': mc_result.get('score_distribution', {}),  # ★ 补齐
+        },
+    }
+
+# ── 主函数 ────────────────────────────────────────────────────────────────────
 def main():
-    """主函数"""
     if len(sys.argv) < 2:
         print("用法: python batch_audit.py <文件或文件夹路径>")
         sys.exit(1)
-    
-    input_path = sys.argv[1]
-    
-    # 初始化模块
-    print("=" * 60)
-    print("图书馆AIGC内容审核工具")
-    print("=" * 60)
-    print("正在初始化...")
-    
-    fact_checker = FactChecker(PATHS['facts_db'])
-    semantic_checker = SemanticChecker(PATHS['synonyms_db'])
-    mc_auditor = MonteCarloAuditor(MC_CONFIG)
-    
-    os.makedirs(PATHS['output_dir'], exist_ok=True)
-    
-    results = []
-    
-    # 判断是文件还是文件夹
-    if os.path.isfile(input_path):
-        # 单个文件
-        if input_path.endswith('.txt'):
-            result = audit_single_file(input_path, fact_checker, semantic_checker, mc_auditor)
-            results.append(result)
-        else:
-            print(f"跳过非TXT文件: {input_path}")
-    
-    elif os.path.isdir(input_path):
-        # 文件夹：处理所有TXT文件
-        txt_files = [f for f in os.listdir(input_path) if f.endswith('.txt')]
-        print(f"找到 {len(txt_files)} 个TXT文件")
-        
-        for i, filename in enumerate(txt_files, 1):
-            print(f"\n[{i}/{len(txt_files)}] ", end='')
-            file_path = os.path.join(input_path, filename)
-            result = audit_single_file(file_path, fact_checker, semantic_checker, mc_auditor)
-            results.append(result)
-        
-        # 生成多案例对比图
-        if len(results) > 1:
-            print("\n生成多案例对比图...")
-            comparison_path = plot_multi_case_comparison(
-                results,
-                os.path.join(PATHS['output_dir'], 'multi_case_comparison.png')
-            )
-            print(f"对比图: {comparison_path}")
-    
-    else:
-        print(f"错误: 路径不存在 - {input_path}")
-        sys.exit(1)
-    
-    # 保存汇总报告
-    summary = {
-        'total': len(results),
-        'cases': results
-    }
-    
-    with open(os.path.join(PATHS['output_dir'], 'audit_summary.json'), 'w', encoding='utf-8') as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2)
-    
-    # 打印汇总
-    print("\n" + "=" * 60)
-    print("审核汇总")
-    print("=" * 60)
-    for r in results:
-        print(f"{r['case_name']}: {r['monte_carlo']['decision']} "
-              f"(通过概率: {r['monte_carlo']['pass_probability']:.1%})")
-    
-    print(f"\n结果保存至: {os.path.abspath(PATHS['output_dir'])}")
 
+    input_path = Path(sys.argv[1])
+
+    print('=' * 65)
+    print('  AIGC 内容审核工具')
+    print('=' * 65)
+    logger.info(f"[BatchAudit] 输入路径: {input_path.resolve()}")
+
+    # ── 加载配置 ──────────────────────────────────────────────────────────────
+    config    = _load_config()
+    paths     = config['paths']
+    mc_config = config['mc_config']
+
+    # 确保输出目录存在
+    paths['output_dir'].mkdir(parents=True, exist_ok=True)
+
+    # ── 模块初始化 ────────────────────────────────────────────────────────────
+    logger.info("[BatchAudit] 正在初始化各模块...")
+    try:
+        fact_checker = FactChecker(str(paths['facts_db']))
+
+        semantic_checker = SemanticChecker(
+            blacklist_db_path = str(paths['blacklist_db']),
+            whitelist_db_path = str(paths['whitelist_db']),
+        )
+
+        mc_auditor = MonteCarloAuditor(mc_config)
+
+        # 接入 visualizer，输出目录与 JSON 报告共用同一目录
+        visualizer = AuditVisualizer(output_dir=str(paths['output_dir']))
+
+    except Exception as e:
+        logger.error(f"[BatchAudit] 模块初始化失败: {e}\n{traceback.format_exc()}")
+        sys.exit(1)
+
+    logger.info("[BatchAudit] 所有模块初始化完成")
+
+    # ── 收集待审核文件 ────────────────────────────────────────────────────────
+    if input_path.is_file():
+        if input_path.suffix.lower() != '.txt':
+            logger.error(f"[BatchAudit] 仅支持 .txt 文件，收到: {input_path.suffix}")
+            sys.exit(1)
+        txt_files = [input_path]
+
+    elif input_path.is_dir():
+        txt_files = sorted(input_path.glob('*.txt'))
+        if not txt_files:
+            logger.warning(f"[BatchAudit] 目录中未找到 .txt 文件: {input_path}")
+            sys.exit(0)
+
+    else:
+        logger.error(f"[BatchAudit] 路径不存在或类型不支持: {input_path}")
+        sys.exit(1)
+
+    logger.info(f"[BatchAudit] 共 {len(txt_files)} 个文件待审核")
+
+    # ── 批量审核 ──────────────────────────────────────────────────────────────
+    results   = []
+    html_reports = []   # 收集所有 HTML 报告路径，最终汇总时写入 summary
+
+    for idx, txt_path in enumerate(txt_files, 1):
+        logger.info(f"[BatchAudit] [{idx}/{len(txt_files)}] 审核: {txt_path.name}")
+        try:
+            text   = txt_path.read_text(encoding='utf-8')
+            result = _audit_single(
+                text             = text,
+                filename         = txt_path.name,
+                fact_checker     = fact_checker,
+                semantic_checker = semantic_checker,
+                mc_auditor       = mc_auditor,
+            )
+            results.append(result)
+
+            # ── 写出单文件 summary JSON ────────────────────────────────────
+            out_json = paths['output_dir'] / f"{txt_path.stem}_audit_summary.json"
+            out_json.write_text(
+                json.dumps(result, ensure_ascii=False, indent=2),
+                encoding='utf-8',
+            )
+
+            # ── 生成可视化 HTML 报告 ───────────────────────────────────────
+            try:
+                html_path = visualizer.generate_report(
+                    audit_result = result,
+                    filename     = txt_path.stem,
+                )
+                html_reports.append(html_path)
+                logger.info(f"[BatchAudit] 可视化报告: {html_path}")
+            except Exception as viz_err:
+                # visualizer 失败不影响主流程，降级为警告
+                logger.warning(
+                    f"[BatchAudit] 可视化生成失败（不影响审核结果）: {viz_err}\n"
+                    f"{traceback.format_exc()}"
+                )
+
+            logger.info(
+                f"[BatchAudit] 完成: {txt_path.name}  "
+                f"→ {result['monte_carlo']['action']}  "
+                f"({result['monte_carlo']['decision']})"
+            )
+
+        except Exception as e:
+            logger.error(
+                f"[BatchAudit] 审核流程异常: {txt_path.stem}\n"
+                f"{traceback.format_exc()}"
+            )
+
+    # ── 汇总报告 ──────────────────────────────────────────────────────────────
+    summary_path = paths['output_dir'] / 'batch_summary.json'
+    summary_path.write_text(
+        json.dumps(
+            {
+                'generated_at': datetime.now().isoformat(),
+                'total':        len(txt_files),
+                'audited':      len(results),
+                'html_reports': html_reports,   # 记录所有 HTML 报告路径
+                'results':      results,
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding='utf-8',
+    )
+
+    logger.info(f"[BatchAudit] 汇总报告: {summary_path}")
+    print('=' * 65)
+    print(f"  审核完成，共处理 {len(results)}/{len(txt_files)} 个文件")
+    print(f"  结果目录: {paths['output_dir'].resolve()}")
+    if html_reports:
+        print(f"  HTML报告: {len(html_reports)} 份")
+    print('=' * 65)
 
 if __name__ == '__main__':
     main()

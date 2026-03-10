@@ -1,212 +1,174 @@
 """
-语义检测模块 - 基于FAISS向量相似度
+semantic_checker.py
 """
 
 import json
+import logging
 import numpy as np
-from typing import List, Dict, Tuple
-import re
-import os
+import faiss as _faiss
 
-os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+from pathlib import Path
+from typing  import Dict, List, Tuple, Optional
 
-# 延迟导入，避免启动时加载
-_faiss = None
-_model = None
+# 修改：导入 encode_queries，不再直接调用 get_model().encode()
+from utils.model_utils import encode_queries, build_faiss_index
+from utils.text_utils  import split_sentences, clean_text
 
+logger = logging.getLogger(__name__)
 
-def _load_faiss():
-    """延迟加载FAISS"""
-    global _faiss
-    if _faiss is None:
-        import faiss
-        _faiss = faiss
-    return _faiss
+_BLACKLIST_SIM_FLOOR = 0.60   # bge/m3e 中文语义清晰，阈值可恢复正常
+_WHITELIST_SIM_FLOOR = 0.45
 
+class _DBIndex:
+    """单份 DB 的 FAISS 索引封装"""
 
-def _load_model():
-    """延迟加载嵌入模型"""
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-        import os
-        
-        # 使用国内镜像
-        os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
-        
-        print("正在加载嵌入模型（首次运行需要下载，约100MB）...")
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
-        print("模型加载完成")
-    return _model
+    def __init__(self, db_path: str, db_role: str):
+        self.db_role = db_role
+        self.db_path = str(Path(db_path).resolve())
 
+        with open(self.db_path, encoding='utf-8') as f:
+            raw = json.load(f)
+
+        self.dimension: int = raw.get('metadata', {}).get('dimension', 512)
+        self._categories: Dict[str, List[Dict]] = {}
+
+        if 'categories' in raw:
+            for name, body in raw['categories'].items():
+                entries = body.get('entries', [])
+                if entries:
+                    self._categories[name] = entries
+        elif 'entries' in raw:
+            self._categories['default'] = raw['entries']
+        else:
+            raise ValueError(f"[_DBIndex:{db_role}] {self.db_path} 格式不合法")
+
+        self._indices: Dict[str, object] = {}
+        for cat_name, entries in self._categories.items():
+            texts = [e['text'] for e in entries]
+            logger.info(f"[_DBIndex:{db_role}] [{cat_name}] 构建索引: {len(texts)} 条")
+            # passage 端由 build_faiss_index 内部使用 encode_passages 编码
+            self._indices[cat_name] = build_faiss_index(texts, self.dimension)
+
+    def search(
+        self,
+        sent_embs: np.ndarray,   # 已由 encode_queries 处理，shape=(n_sents, dim)
+        sentences: List[str],
+        top_k:     int   = 3,
+        sim_floor: float = 0.0,
+    ) -> List[Dict]:
+        results: List[Dict] = []
+
+        for cat_name, index in self._indices.items():
+            entries    = self._categories[cat_name]
+            k          = min(top_k, index.ntotal)
+            sims, idxs = index.search(sent_embs, k)
+
+            for sent_i, (sim_row, idx_row) in enumerate(zip(sims, idxs)):
+                for sim_val, entry_idx in zip(sim_row, idx_row):
+                    if entry_idx < 0:
+                        continue
+                    sim_f = float(sim_val)
+                    if sim_f < sim_floor:
+                        continue
+
+                    entry = entries[entry_idx]
+                    w     = float(entry.get('weight', 1.0))
+                    results.append({
+                        'category':   cat_name,
+                        'sentence':   sentences[sent_i],
+                        'matched':    entry['text'],
+                        'similarity': sim_f,
+                        'weight':     w,
+                        'w_sim':      sim_f * w,
+                        'db_role':    self.db_role,
+                    })
+
+        return results
 
 class SemanticChecker:
-    def __init__(self, db_path: str = "config/synonyms_db.json"):
-        with open(db_path, 'r', encoding='utf-8') as f:
-            self.db = json.load(f)
-        
-        self.categories = self.db['categories']
-        self.dimension = self.db['metadata']['dimension']
-        
-        # 构建索引
-        self.indices = {}      # FAISS索引
-        self.entries = {}      # 原始条目
-        self._build_indices()
-    
-    def _build_indices(self):
-        """为每个类别构建FAISS向量索引"""
-        model = _load_model()
-        faiss = _load_faiss()
-        
-        for cat_name, cat_data in self.categories.items():
-            entries = cat_data['entries']
-            texts = [e['text'] for e in entries]
-            
-            # 编码为向量
-            print(f"构建 [{cat_name}] 索引: {len(texts)} 条...")
-            embeddings = model.encode(texts, convert_to_numpy=True)
-            embeddings = embeddings.astype('float32')
-            
-            # 归一化（余弦相似度）
-            faiss.normalize_L2(embeddings)
-            
-            # 构建FAISS索引（Flat索引，精确搜索）
-            index = faiss.IndexFlatIP(self.dimension)  # 内积 = 余弦相似度（已归一化）
-            index.add(embeddings)
-            
-            self.indices[cat_name] = index
-            self.entries[cat_name] = entries
-    
-    def check(self, text: str, top_k: int = 3) -> Tuple[np.ndarray, List[Dict]]:
-        """
-        语义检测：返回四维分数 + 匹配详情
-        分数：[品牌调性, 合规安全, 规范度, 综合语义]
-        """
-        model = _load_model()
-        
-        # 分句处理（简单按标点分割）
-        sentences = re.split(r'[。！？\n]', text)
-        sentences = [s.strip() for s in sentences if len(s.strip()) > 3]
-        
-        if not sentences:
-            return np.array([0.0, 0.0, 1.0, 1.0]), []  # 无有效句子，默认规范
-        
-        # 编码所有句子
-        sentence_embeddings = model.encode(sentences, convert_to_numpy=True)
-        sentence_embeddings = sentence_embeddings.astype('float32')
-        faiss = _load_faiss()
-        faiss.normalize_L2(sentence_embeddings)
-        
-        # 各类别检测
-        results = {
-            '口语化表达': {'max_sim': 0.0, 'matches': []},
-            '敏感词风险': {'max_sim': 0.0, 'matches': []},
-            '规范表达参考': {'max_sim': 0.0, 'matches': []}
-        }
-        
-        all_matches = []
-        
-        for cat_name in ['口语化表达', '敏感词风险', '规范表达参考']:
-            if cat_name not in self.indices:
-                continue
-            
-            index = self.indices[cat_name]
-            threshold = self.categories[cat_name]['threshold']
-            entries = self.entries[cat_name]
-            
-            # FAISS检索：每个句子找最相似的top_k
-            similarities, indices = index.search(sentence_embeddings, top_k)
-            
-            for sent_idx, (sims, idxs) in enumerate(zip(similarities, indices)):
-                for sim, idx in zip(sims, idxs):
-                    if sim > threshold and sim > results[cat_name]['max_sim']:
-                        results[cat_name]['max_sim'] = float(sim)
-                        
-                        match_info = {
-                            'category': cat_name,
-                            'matched_sentence': sentences[sent_idx],
-                            'matched_entry': entries[idx]['text'],
-                            'similarity': float(sim),
-                            'type': entries[idx]['type'],
-                            'weight': entries[idx]['weight'],
-                            'severity': self.categories[cat_name]['severity'],
-                            'suggestion': self.categories[cat_name]['suggestion']
-                        }
-                        results[cat_name]['matches'].append(match_info)
-                        all_matches.append(match_info)
-        
-        # 计算分数（归一化到0-1）
-        # 口语化：越高越差
-        口语化分数 = min(results['口语化表达']['max_sim'] * 1.2, 1.0)
-        
-        # 敏感风险：越高越差
-        敏感分数 = min(results['敏感词风险']['max_sim'] * 1.1, 1.0)
-        
-        # 规范度：越高越好（与规范表达的相似度）
-        规范分数 = results['规范表达参考']['max_sim']
-        
-        # 综合语义分：规范度 - 口语化 - 敏感风险（裁剪到0-1）
-        综合分数 = max(0, 规范分数 - 口语化分数 * 0.5 - 敏感分数 * 0.5)
-        
-        scores = np.array([
-            1.0 - 口语化分数,      # 品牌调性（1=好，0=差）
-            1.0 - 敏感分数,        # 合规安全
-            规范分数,              # 表达规范（参考）
-            综合分数               # 综合语义
-        ])
-        
-        return scores, all_matches
-    
-    def get_similar_words(self, query: str, category: str = None, top_k: int = 5) -> List[Dict]:
-        """调试工具：查询与某个词最相似的库中条目"""
-        model = _load_model()
-        faiss = _load_faiss()
-        
-        query_vec = model.encode([query], convert_to_numpy=True).astype('float32')
-        faiss.normalize_L2(query_vec)
-        
-        results = []
-        cats = [category] if category else list(self.indices.keys())
-        
-        for cat in cats:
-            if cat not in self.indices:
-                continue
-            sims, idxs = self.indices[cat].search(query_vec, top_k)
-            for sim, idx in zip(sims[0], idxs[0]):
-                results.append({
-                    'category': cat,
-                    'text': self.entries[cat][idx]['text'],
-                    'similarity': float(sim),
-                    'type': self.entries[cat][idx]['type']
-                })
-        
-        return sorted(results, key=lambda x: x['similarity'], reverse=True)[:top_k]
+    """
+    双库语义检测器
+    """
 
+    _cache: Dict[str, _DBIndex] = {}
 
-# 测试代码
-if __name__ == "__main__":
-    import os
-    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    
-    print("初始化语义检测器...")
-    checker = SemanticChecker("config/synonyms_db.json")
-    
-    test_texts = [
-        "亲，超赞的新书到了哦，赶紧来借吧！",  # 高口语化
-        "免费下载知网论文，限时福利不要错过",  # 高敏感风险
-        "图书馆提供学术资源服务，欢迎广大师生使用",  # 规范
-        "这本书很棒，推荐大家阅读"  # 中等口语化
-    ]
-    
-    for text in test_texts:
-        print(f"\n{'='*60}")
-        print(f"文本：{text}")
-        scores, matches = checker.check(text)
-        print(f"分数：[品牌调性={scores[0]:.3f}, 合规安全={scores[1]:.3f}, "
-              f"规范度={scores[2]:.3f}, 综合语义={scores[3]:.3f}]")
-        
-        if matches:
-            print(f"检测到 {len(matches)} 处语义匹配：")
-            for m in matches[:3]:  # 只显示前3个
-                print(f"  - [{m['category']}] '{m['matched_entry']}' "
-                      f"(相似度{m['similarity']:.3f}, {m['type']})")
+    def __init__(
+        self,
+        blacklist_db_path:        str,
+        whitelist_db_path:        str,
+        blacklist_category_roles: Optional[Dict[str, str]] = None,
+    ):
+        self.blacklist_path = str(Path(blacklist_db_path).resolve())
+        self.whitelist_path = str(Path(whitelist_db_path).resolve())
+        self._cat_roles     = blacklist_category_roles or {}
+
+        if self.blacklist_path not in SemanticChecker._cache:
+            SemanticChecker._cache[self.blacklist_path] = _DBIndex(
+                self.blacklist_path, 'blacklist'
+            )
+        if self.whitelist_path not in SemanticChecker._cache:
+            SemanticChecker._cache[self.whitelist_path] = _DBIndex(
+                self.whitelist_path, 'whitelist'
+            )
+
+        self._bl: _DBIndex = SemanticChecker._cache[self.blacklist_path]
+        self._wl: _DBIndex = SemanticChecker._cache[self.whitelist_path]
+
+    def check(
+        self,
+        text:  str,
+        top_k: int = 3,
+    ) -> Tuple[np.ndarray, List[Dict]]:
+        """
+        双库检测
+        scores[0] brand_score      = 1 - mean(口语化惩罚池)
+        scores[1] compliance_score = 1 - mean(敏感词惩罚池)
+        scores[2] norm_score       = mean(白名单奖励池)
+        """
+        if not text or not text.strip():
+            logger.warning("[SemanticChecker] 空文本，返回保守默认分")
+            return np.array([1.0, 1.0, 0.0], dtype=np.float64), []
+
+        sentences = split_sentences(clean_text(text)) or [text.strip()]
+
+        sent_embs = encode_queries(sentences)
+
+        bl_matches = self._bl.search(
+            sent_embs, sentences,
+            top_k=top_k, sim_floor=_BLACKLIST_SIM_FLOOR,
+        )
+        wl_matches = self._wl.search(
+            sent_embs, sentences,
+            top_k=top_k, sim_floor=_WHITELIST_SIM_FLOOR,
+        )
+
+        brand_pen:      List[float] = []
+        compliance_pen: List[float] = []
+
+        for m in bl_matches:
+            role = self._cat_roles.get(m['category'], 'brand')
+            (compliance_pen if role == 'compliance' else brand_pen).append(m['w_sim'])
+
+        norm_pool = [m['w_sim'] for m in wl_matches]
+
+        brand_score      = float(np.clip(1.0 - _safe_mean(brand_pen),      0.0, 1.0))
+        compliance_score = float(np.clip(1.0 - _safe_mean(compliance_pen), 0.0, 1.0))
+        norm_score       = float(np.clip(_safe_mean(norm_pool),            0.0, 1.0))
+
+        scores = np.array(
+            [brand_score, compliance_score, norm_score],
+            dtype=np.float64,
+        )
+
+        logger.info(
+            f"[SemanticChecker] "
+            f"bl_hits={len(bl_matches)}  wl_hits={len(wl_matches)}\n"
+            f"  brand={brand_score:.3f}  "
+            f"compliance={compliance_score:.3f}  "
+            f"norm={norm_score:.3f}"
+        )
+
+        return scores, bl_matches + wl_matches
+
+def _safe_mean(values: List[float]) -> float:
+    return float(np.mean(values)) if values else 0.0
