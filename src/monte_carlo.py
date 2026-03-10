@@ -1,319 +1,271 @@
 """
-蒙特卡洛模拟模块
+monte_carlo.py
+蒙特卡洛综合评分审核模块
+接口：MonteCarloAuditor(config: dict)
+      config 必须包含 base_weights / perturbation_sigma / weight_bounds /
+                       n_simulations / pass_threshold / review_threshold
+      可选包含 random_seed / single_dim_reject / bc_avg_reject /
+               fact_review_floor / pass_prob_min（硬性规则阈值）
 """
 
+import logging
 import numpy as np
-from numba import njit
-from typing import Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG = {
-    'n_simulations': 10000,      # 模拟次数
-    'perturbation_sigma': 0.15,   # 权重扰动标准差（模拟人工差异程度）
-    'base_weights': np.array([0.40, 0.25, 0.25, 0.10]),  # [事实, 品牌, 合规, 规范]
-    'weight_bounds': (0.05, 0.80),  # 权重裁剪边界
-    'random_seed': None           # 随机种子
+# ── 默认配置（仅作兜底，实际由 config.ini 通过 batch_audit 传入）────────────
+_DEFAULT_CONFIG: Dict[str, Any] = {
+    'base_weights':       [0.50, 0.18, 0.20, 0.12],
+    'perturbation_sigma': 0.05,
+    'weight_bounds':      (0.05, 0.75),
+    'n_simulations':      10_000,
+    'pass_threshold':     0.82,
+    'review_threshold':   0.60,
+    'random_seed':        42,
+    # 硬性否决阈值
+    'single_dim_reject':  0.45,
+    'bc_avg_reject':      0.50,
+    # 硬性复核阈值
+    'fact_review_floor':  0.95,
+    'pass_prob_min':      0.60,
 }
 
-
-# 核心采样函数
-@njit
-def _single_audit_sample(
-    fact_score: float,
-    semantic_scores: np.ndarray,
-    base_weights: np.ndarray,
-    perturb_sigma: float,
-    weight_bounds: Tuple[float, float]
-) -> float:
-    """
-    单次审核采样：对权重加入扰动，计算综合分数
-    
-    """
-    # 事实分数：硬标准，不扰动
-    # 语义分数：软标准，权重可扰动
-    
-    # 复制基础权重
-    weights = base_weights.copy()
-    
-    # 对品牌、合规、规范的权重加入高斯扰动（索引1,2,3）
-    # 事实权重（索引0）固定，因为它是客观标准
-    for i in range(1, 4):
-        perturbation = np.random.normal(1.0, perturb_sigma)
-        weights[i] *= perturbation
-    
-    # 权重归一化（确保和为1）
-    weights = weights / weights.sum()
-    
-    # 裁剪到合理范围（避免某个权重过大或过小）
-    weights = np.clip(weights, weight_bounds[0], weight_bounds[1])
-    weights = weights / weights.sum()  # 再次归一化
-    
-    # 计算综合分数（加权求和）
-    # 事实分数 × 事实权重 + 语义分数 × 语义权重
-    all_scores = np.array([fact_score, semantic_scores[0], 
-                          semantic_scores[1], semantic_scores[2]])
-    final_score = np.sum(all_scores * weights)
-    
-    # 裁剪到0-1范围
-    return 0.0 if final_score < 0.0 else (1.0 if final_score > 1.0 else final_score)
-
-
-# =========================
-# 主模拟函数（对应 主模拟）
-# =========================
-@njit
-def _monte_carlo_simulation(
-    fact_score: float,
-    semantic_scores: np.ndarray,
-    base_weights: np.ndarray,
-    perturb_sigma: float,
-    weight_bounds: Tuple[float, float],
-    n_simulations: int
-) -> np.ndarray:
-    """
-    蒙特卡洛主模拟：重复采样得到分数分布
-    
-    """
-    scores = np.empty(n_simulations, dtype=np.float64)
-    
-    for i in range(n_simulations):
-        scores[i] = _single_audit_sample(
-            fact_score, semantic_scores, base_weights,
-            perturb_sigma, weight_bounds
-        )
-    
-    return scores
-
+# config 必须包含的字段
+_REQUIRED_KEYS: List[str] = [
+    'base_weights', 'perturbation_sigma', 'weight_bounds',
+    'n_simulations', 'pass_threshold', 'review_threshold',
+]
 
 class MonteCarloAuditor:
-    """
-    蒙特卡洛审核器：量化审核决策的不确定性
-    """
-    
-    def __init__(self, config: Dict = None):
-        self.config = {**DEFAULT_CONFIG, **(config or {})}
-        self.rng = np.random.RandomState(self.config['random_seed'])
-        
-        # 设置全局随机种子
-        if self.config['random_seed'] is not None:
-            np.random.seed(self.config['random_seed'])
-    
+
+    def __init__(self, config: dict = None):
+        """
+        初始化蒙特卡洛审核器
+        :param config: 由 batch_audit._load_config() 传入的配置 dict
+                       传 None 时使用内置默认值并打印警告
+        """
+        if config is None:
+            logger.warning(
+                "[MonteCarloAuditor] 未传入外部配置，使用内置默认值\n"
+                "  请检查 batch_audit.py 是否正确读取并传入 config.ini"
+            )
+            cfg = dict(_DEFAULT_CONFIG)
+        else:
+            # 检查必要字段
+            missing = [k for k in _REQUIRED_KEYS if k not in config]
+            if missing:
+                raise KeyError(
+                    f"[MonteCarloAuditor] 传入 config 缺少必要字段: {missing}"
+                )
+            # 外部配置覆盖默认值（保留硬性规则字段的默认值）
+            cfg = {**_DEFAULT_CONFIG, **config}
+
+        # base_weights：统一转为 np.ndarray 并归一化
+        # 修复核心：无论传入 list / np.ndarray / 其他可迭代，统一用 np.asarray
+        #           不用 np.array(weights) ← 旧版写法，传入 dict 时直接崩溃
+        cfg['base_weights'] = np.asarray(
+            cfg['base_weights'], dtype=np.float64
+        ).ravel()
+
+        w_sum = cfg['base_weights'].sum()
+        if w_sum <= 0:
+            raise ValueError("[MonteCarloAuditor] base_weights 之和必须 > 0")
+        cfg['base_weights'] = cfg['base_weights'] / w_sum
+
+        cfg['weight_bounds'] = tuple(cfg['weight_bounds'])
+
+        self.config = cfg
+        self._rng   = np.random.default_rng(int(cfg['random_seed']))
+
+        logger.info(
+            f"[MonteCarloAuditor] 初始化完成\n"
+            f"  weights        = {np.round(cfg['base_weights'], 3).tolist()}\n"
+            f"  n_simulations  = {cfg['n_simulations']}\n"
+            f"  pass_threshold = {cfg['pass_threshold']}  "
+            f"review_threshold = {cfg['review_threshold']}\n"
+            f"  hard_reject: single<{cfg['single_dim_reject']} "
+            f"| bc_avg<{cfg['bc_avg_reject']}\n"
+            f"  hard_review: fact<{cfg['fact_review_floor']} "
+            f"| pass_prob<{cfg['pass_prob_min']}"
+        )
+
+    # ── 主入口 ────────────────────────────────────────────────────────────────
     def audit(
         self,
-        fact_score: float,
-        semantic_scores: np.ndarray,
-        progress_callback=None
-    ) -> Dict:
+        fact_score:   float,
+        sem_scores:   np.ndarray,  # shape=(3,): [brand, compliance, norm]
+    ) -> Dict[str, Any]:
         """
-        执行蒙特卡洛审核，返回完整统计结果
+        执行蒙特卡洛模拟并作出审核决策
+        :param fact_score:  事实核查得分 [0,1]
+        :param sem_scores:  语义检测三维得分 [brand, compliance, norm]
+        :return: 包含 mean/median/std/ci_95/pass_probability/
+                 review_probability/reject_probability/decision 的字典
         """
-        n = self.config['n_simulations']
-        base_w = self.config['base_weights']
-        sigma = self.config['perturbation_sigma']
-        bounds = self.config['weight_bounds']
-        
+        sem_scores = np.asarray(sem_scores, dtype=np.float64).ravel()
+        if sem_scores.shape[0] != 3:
+            raise ValueError(
+                f"[MonteCarloAuditor] sem_scores 期望 shape=(3,)，"
+                f"收到 shape={sem_scores.shape}"
+            )
+
+        # 拼接四维得分向量 [fact, brand, compliance, norm]
+        all_scores = np.concatenate([[float(fact_score)], sem_scores])
+
         # 执行模拟
-        scores = _monte_carlo_simulation(
-            fact_score, semantic_scores, base_w,
-            sigma, bounds, n
-        )
-        
-        # 统计计算
-        result = self._calculate_statistics(scores)
-        
-        # 决策建议（新增：对应审核场景）
-        result['decision'] = self._generate_decision(result)
-        
-        return result
-    
-    def _calculate_statistics(self, scores: np.ndarray) -> Dict:
-        """
-        统计计算
-        """
-        # 基础统计量
-        mean = scores.mean()
-        median = np.median(scores)
-        std = scores.std()
-        min_val = scores.min()
-        max_val = scores.max()
-        
-        # 变异系数（相对不确定性）
-        cv = std / mean if mean > 0 else 0
-        
-        # 分位点
-        percentiles = [10, 25, 50, 75, 90, 95]
-        percentile_values = np.percentile(scores, percentiles)
-        
-        # 置信区间（P10-P90）
-        ci_lower = percentile_values[0]   # P10
-        ci_upper = percentile_values[4]   # P90
-        
+        mc_stats = self._simulate(all_scores)
+
         # 决策
-        pass_prob = np.mean(scores > 0.80)   # 通过概率
-        review_prob = np.mean((scores > 0.60) & (scores <= 0.80))  # 复核概率
-        reject_prob = np.mean(scores <= 0.60)  # 拒绝概率
-        
+        decision = self._make_decision(
+            mc_result  = mc_stats,
+            fact_score = float(fact_score),
+            sem_scores = sem_scores,
+        )
+
+        return {**mc_stats, 'decision': decision}
+
+    # ── 蒙特卡洛模拟 ─────────────────────────────────────────────────────────
+    def _simulate(self, scores: np.ndarray) -> Dict[str, float]:
+        """对权重加高斯扰动，统计加权得分分布"""
+        cfg  = self.config
+        n    = int(cfg['n_simulations'])
+        base = cfg['base_weights'].copy()         # shape=(4,)
+        w_lo, w_hi = cfg['weight_bounds']
+        sigma      = float(cfg['perturbation_sigma'])
+
+        # 权重扰动并归一化
+        noise       = self._rng.normal(0, sigma, size=(n, len(base)))
+        w_perturbed = np.clip(base + noise, w_lo, w_hi)
+        w_perturbed = w_perturbed / w_perturbed.sum(axis=1, keepdims=True)  # shape=(n,4)
+
+        # 加权得分
+        sim_scores = w_perturbed @ scores   # shape=(n,)
+
+        pass_thr   = float(cfg['pass_threshold'])
+        review_thr = float(cfg['review_threshold'])
+
+        ci_low, ci_high = np.percentile(sim_scores, [2.5, 97.5])
+
         return {
-            'scores': scores,           # 原始分数列表（用于可视化）
-            'mean': mean,               # 均值
-            'median': median,           # 中位数
-            'std': std,                 # 标准差
-            'cv': cv,                   # 变异系数
-            'min': min_val,             # 最小值
-            'max': max_val,             # 最大值
-            'percentiles': dict(zip(percentiles, percentile_values)),
-            'ci_lower': ci_lower,       # 置信区间下限（P10）
-            'ci_upper': ci_upper,       # 置信区间上限（P90）
-            'pass_probability': pass_prob,
-            'review_probability': review_prob,
-            'reject_probability': reject_prob
-        }
-    
-    def _generate_decision(self, stats: Dict) -> Dict:
-        """
-        生成决策建议
-        """
-        p_pass = stats['pass_probability']
-        p_review = stats['review_probability']
-        p_reject = stats['reject_probability']
-        median = stats['median']
-        ci_width = stats['ci_upper'] - stats['ci_lower']
-        
-        # 决策逻辑
-        if p_pass > 0.90:
-            recommendation = "通过"
-            confidence = "high"
-            action = "建议直接发布，高置信度通过"
-        elif p_pass > 0.70:
-            recommendation = "谨慎通过"
-            confidence = "medium"
-            action = "建议发布，但需关注特定风险点"
-        elif p_review > 0.50:
-            recommendation = "人工复核"
-            confidence = "medium"
-            action = "建议人工复核，自动审核不确定"
-        elif p_reject > 0.70:
-            recommendation = "重审"
-            confidence = "high"
-            action = "建议修改后重审，存在明确问题"
-        else:
-            recommendation = "建议重审"
-            confidence = "medium"
-            action = "建议按修改意见调整后重审"
-        
-        # 不确定性评估
-        uncertainty_level = "low" if ci_width < 0.15 else "medium" if ci_width < 0.30 else "high"
-        
-        return {
-            'recommendation': recommendation,
-            'confidence': confidence,
-            'uncertainty_level': uncertainty_level,
-            'action': action,
-            'summary': f"{action}（通过概率{p_pass:.1%}，不确定性{uncertainty_level}）"
-        }
-    
-    def sensitivity_analysis(self, fact_score: float, semantic_scores: np.ndarray) -> Dict:
-        """
-        敏感性分析：测试不同扰动幅度下的结果稳定性
-        """
-        sigmas = [0.05, 0.10, 0.15, 0.20, 0.30]
-        results = []
-        
-        original_sigma = self.config['perturbation_sigma']
-        
-        for sigma in sigmas:
-            self.config['perturbation_sigma'] = sigma
-            result = self.audit(fact_score, semantic_scores)
-            results.append({
-                'sigma': sigma,
-                'mean': result['mean'],
-                'std': result['std'],
-                'pass_prob': result['pass_probability']
-            })
-        
-        # 恢复原始配置
-        self.config['perturbation_sigma'] = original_sigma
-        
-        return {
-            'optimal_sigma': original_sigma,
-            'analysis': results,
-            'conclusion': f"当前sigma={original_sigma}在稳定性和区分度间取得平衡"
+            'mean':               float(np.mean(sim_scores)),
+            'median':             float(np.median(sim_scores)),
+            'std':                float(np.std(sim_scores)),
+            'ci_95':              [float(ci_low), float(ci_high)],
+            'pass_probability':   float(np.mean(sim_scores >= pass_thr)),
+            'review_probability': float(np.mean(
+                (sim_scores >= review_thr) & (sim_scores < pass_thr)
+            )),
+            'reject_probability': float(np.mean(sim_scores < review_thr)),
         }
 
+    # ── 决策逻辑 ──────────────────────────────────────────────────────────────
+    def _make_decision(
+        self,
+        mc_result:  Dict[str, float],
+        fact_score: float,
+        sem_scores: np.ndarray,   # [brand, compliance, norm]
+    ) -> Dict[str, Any]:
+        """
+        决策优先级（从高到低）：
+          ① 硬性否决 — brand/compliance 严重偏低 → REJECT
+          ② 硬性复核 — fact_score 有问题 / pass_prob 不足 → REVIEW
+          ③ 概率阈值 — 正常流程
+        """
+        cfg        = self.config
+        brand      = float(sem_scores[0])
+        compliance = float(sem_scores[1])
+        mean       = mc_result['mean']
+        pass_prob  = mc_result['pass_probability']
 
-# =========================
-# 测试代码
-# =========================
-if __name__ == "__main__":
-    print("=" * 70)
-    print("蒙特卡洛审核模拟测试")
-    print("=" * 70)
-    
-    # 初始化审核器
-    auditor = MonteCarloAuditor({
-        'n_simulations': 10000,
-        'perturbation_sigma': 0.15,
-        'random_seed': 42  # 保证可复现
-    })
-    
-    # 测试案例
-    test_cases = [
-        {
-            'name': '案例A：完美文本',
-            'fact': 1.0,           # 无事实错误
-            'semantic': np.array([1.0, 1.0, 0.9])  # 品牌、合规、规范都好
-        },
-        {
-            'name': '案例B：事实错误',
-            'fact': 0.0,           # 有事实错误（一票否决）
-            'semantic': np.array([0.9, 0.9, 0.8])
-        },
-        {
-            'name': '案例C：高口语化',
-            'fact': 1.0,
-            'semantic': np.array([0.4, 0.9, 0.7])  # 品牌调性差
-        },
-        {
-            'name': '案例D：边界案例',
-            'fact': 0.8,           # 轻微事实问题
-            'semantic': np.array([0.7, 0.6, 0.8])  # 各方面都一般
-        }
-    ]
-    
-    for case in test_cases:
-        print(f"\n{'-'*70}")
-        print(f"测试：{case['name']}")
-        print(f"输入：事实={case['fact']}, 语义={case['semantic']}")
-        
-        result = auditor.audit(case['fact'], case['semantic'])
-        decision = result['decision']
-        
-        print(f"\n统计结果：")
-        print(f"  均值={result['mean']:.4f}, 中位数={result['median']:.4f}, "
-              f"标准差={result['std']:.4f}")
-        print(f"  变异系数={result['cv']:.4f}（相对不确定性）")
-        print(f"  置信区间：[{result['ci_lower']:.4f}, {result['ci_upper']:.4f}] "
-              f"(P10-P90)")
-        
-        print(f"\n决策概率：")
-        print(f"  通过(>0.8)：{result['pass_probability']:.2%}")
-        print(f"  复核(0.6-0.8)：{result['review_probability']:.2%}")
-        print(f"  拒绝(<0.6)：{result['reject_probability']:.2%}")
-        
-        print(f"\n决策建议：")
-        print(f"  [{decision['recommendation']}] {decision['summary']}")
-        print(f"  置信度：{decision['confidence']}, "
-              f"不确定性：{decision['uncertainty_level']}")
-        
-        # 敏感性分析（仅第一个案例）
-        if case['name'] == '案例D：边界案例':
-            print(f"\n[敏感性分析] 不同扰动幅度下的结果：")
-            sens = auditor.sensitivity_analysis(case['fact'], case['semantic'])
-            for item in sens['analysis']:
-                print(f"  σ={item['sigma']:.2f}: "
-                      f"均值={item['mean']:.3f}, "
-                      f"通过概率={item['pass_prob']:.1%}")
-    
-    print(f"\n{'='*70}")
-    print("测试完成")
-    print(f"{'='*70}")
+        # ── ① 硬性否决 ────────────────────────────────────────────────────────
+        single_thr = float(cfg['single_dim_reject'])
+        avg_thr    = float(cfg['bc_avg_reject'])
+
+        if brand < single_thr:
+            return _reject(
+                f"品牌调性分 {brand:.3f} < 否决阈值 {single_thr}，"
+                f"内容风格严重不符，建议重写",
+                trigger='hard_reject',
+            )
+        if compliance < single_thr:
+            return _reject(
+                f"合规安全分 {compliance:.3f} < 否决阈值 {single_thr}，"
+                f"存在敏感内容风险，建议重写",
+                trigger='hard_reject',
+            )
+        if (brand + compliance) / 2 < avg_thr:
+            return _reject(
+                f"品牌+合规均值 {(brand+compliance)/2:.3f} < {avg_thr}，"
+                f"整体内容质量不足，建议重写",
+                trigger='hard_reject',
+            )
+
+        # ── ② 硬性复核 ────────────────────────────────────────────────────────
+        fact_floor    = float(cfg['fact_review_floor'])
+        pass_prob_min = float(cfg['pass_prob_min'])
+
+        if fact_score < fact_floor:
+            return _review(
+                f"事实核查分 {fact_score:.3f} < {fact_floor}，"
+                f"存在事实性问题，需人工核实",
+                trigger='hard_review',
+            )
+        if pass_prob < pass_prob_min:
+            return _review(
+                f"通过概率 {pass_prob:.2%} < {pass_prob_min:.0%}，"
+                f"置信度不足，需人工确认",
+                trigger='hard_review',
+            )
+
+        # ── ③ 概率阈值判断 ────────────────────────────────────────────────────
+        pass_thr   = float(cfg['pass_threshold'])
+        review_thr = float(cfg['review_threshold'])
+
+        if mean >= pass_thr:
+            return _approve(
+                f"均值 {mean:.3f} ≥ 通过阈值 {pass_thr}",
+                trigger='probability',
+            )
+        if mean >= review_thr:
+            return _review(
+                f"均值 {mean:.3f} 处于复核区间 [{review_thr}, {pass_thr})，"
+                f"建议人工确认",
+                trigger='probability',
+            )
+        return _reject(
+            f"均值 {mean:.3f} < 复核阈值 {review_thr}，内容质量不足",
+            trigger='probability',
+        )
+
+# ── 决策构造辅助函数 ──────────────────────────────────────────────────────────
+
+def _approve(reason: str, trigger: str) -> Dict[str, Any]:
+    return {
+        'recommendation': '建议通过',
+        'action':         'APPROVE',
+        'confidence':     'HIGH',
+        'uncertainty_level': 'LOW',
+        'reason':         reason,
+        'trigger':        trigger,
+    }
+
+def _review(reason: str, trigger: str) -> Dict[str, Any]:
+    return {
+        'recommendation': '建议人工复核',
+        'action':         'REVIEW',
+        'confidence':     'MEDIUM',
+        'uncertainty_level': 'MEDIUM',
+        'reason':         reason,
+        'trigger':        trigger,
+    }
+
+def _reject(reason: str, trigger: str) -> Dict[str, Any]:
+    return {
+        'recommendation': '建议重写',
+        'action':         'REJECT',
+        'confidence':     'HIGH',
+        'uncertainty_level': 'LOW',
+        'reason':         reason,
+        'trigger':        trigger,
+    }

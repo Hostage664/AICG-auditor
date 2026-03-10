@@ -1,30 +1,101 @@
 {
-  "metadata": {
-    "library_name": "图书馆",
-    "version": "1.0"
-  },
+  "version": "1.0",
+  "description": "图书馆AIGC内容审核事实核查规则库",
   "rules": [
     {
-      "id": "open_time",
-      "name": "开放时间",
-      "category": "开放时间",
+      "id": "FC001",
+      "name": "开放时间检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d{1,2})(?:点|时|:00)",
+      "min_val": 7,
+      "max_val": 22,
       "severity": "error",
-      "pattern_type": "regex",
-      "pattern": "23[:：]00|23点",
-      "invalid_values": ["23:00", "23点"],
-      "error_message": "开放时间错误，总馆应为22:00闭馆",
-      "suggestion": "请核实最新开放时间"
+      "error_message": "图书馆开放时间应在7:00-22:00之间，请核实"
     },
     {
-      "id": "borrow_limit",
-      "name": "借阅数量",
-      "category": "借阅规则",
-      "severity": "error",
+      "id": "FC002",
+      "name": "借阅册数检查",
       "pattern_type": "regex_number_range",
-      "pattern": "(\\d+)\\s*[本册]",
-      "max_value": 20,
-      "error_message": "借阅数量超限，本科生最多20册",
-      "suggestion": "请区分读者类型或更正数量"
+      "pattern": "(\\d+)\\s*(?:本|册)",
+      "min_val": 1,
+      "max_val": 30,
+      "severity": "error",
+      "error_message": "单次借阅册数应在1-30册之间，请核实"
+    },
+    {
+      "id": "FC003",
+      "name": "借阅天数检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d+)\\s*天",
+      "min_val": 1,
+      "max_val": 60,
+      "severity": "error",
+      "error_message": "借阅天数应在1-60天之间，请核实"
+    },
+    {
+      "id": "FC004",
+      "name": "滞纳金检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d+(?:\\.\\d+)?)\\s*元(?:/天|每天)",
+      "min_val": 0.0,
+      "max_val": 0.5,
+      "severity": "error",
+      "error_message": "滞纳金标准应不超过0.5元/天，请核实"
+    },
+    {
+      "id": "FC005",
+      "name": "续借次数检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "续借(\\d+)次",
+      "min_val": 1,
+      "max_val": 3,
+      "severity": "warning",
+      "error_message": "续借次数应在1-3次之间，请核实"
+    },
+    {
+      "id": "FC006",
+      "name": "电话号码格式检查",
+      "pattern_type": "phone_format",
+      "severity": "warning",
+      "error_message": "电话号码格式不规范，建议使用标准格式（如：0431-85166666）"
+    },
+    {
+      "id": "FC007",
+      "name": "禁止夸大馆藏数量",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d+)\\s*(?:万|千)?\\s*(?:册|本|种)(?:图书|藏书|馆藏)",
+      "min_val": 1,
+      "max_val": 500,
+      "severity": "warning",
+      "error_message": "馆藏数量描述可能存在夸大，请核实（单位：万册）"
+    },
+    {
+      "id": "FC008",
+      "name": "违规词检查-绝对化用语",
+      "pattern_type": "regex",
+      "pattern": "最好|第一|唯一|绝对|永远免费|完全免费",
+      "severity": "error",
+      "error_message": "包含绝对化用语，不符合规范要求"
+    },
+    {
+      "id": "FC009",
+      "name": "座位数量检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "(\\d+)\\s*个(?:座位|自习座位|阅览座位)",
+      "min_val": 1,
+      "max_val": 5000,
+      "severity": "warning",
+      "error_message": "座位数量描述异常，请核实"
+    },
+    {
+      "id": "FC010",
+      "name": "罚款金额检查",
+      "pattern_type": "regex_number_range",
+      "pattern": "(?:罚款|赔偿)(\\d+(?:\\.\\d+)?)\\s*元",
+      "min_val": 0,
+      "max_val": 200,
+      "severity": "error",
+      "error_message": "罚款/赔偿金额超出合理范围，请核实"
     }
   ]
 }
