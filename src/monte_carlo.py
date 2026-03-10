@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# ── 默认配置（仅作兜底，实际由 config.ini 通过 batch_audit 传入）────────────
+# 默认配置
 _DEFAULT_CONFIG: Dict[str, Any] = {
     'base_weights':       [0.50, 0.18, 0.20, 0.12],
     'perturbation_sigma': 0.05,
@@ -31,7 +31,6 @@ _DEFAULT_CONFIG: Dict[str, Any] = {
     'pass_prob_min':      0.60,
 }
 
-# config 必须包含的字段
 _REQUIRED_KEYS: List[str] = [
     'base_weights', 'perturbation_sigma', 'weight_bounds',
     'n_simulations', 'pass_threshold', 'review_threshold',
@@ -42,8 +41,6 @@ class MonteCarloAuditor:
     def __init__(self, config: dict = None):
         """
         初始化蒙特卡洛审核器
-        :param config: 由 batch_audit._load_config() 传入的配置 dict
-                       传 None 时使用内置默认值并打印警告
         """
         if config is None:
             logger.warning(
@@ -62,8 +59,6 @@ class MonteCarloAuditor:
             cfg = {**_DEFAULT_CONFIG, **config}
 
         # base_weights：统一转为 np.ndarray 并归一化
-        # 修复核心：无论传入 list / np.ndarray / 其他可迭代，统一用 np.asarray
-        #           不用 np.array(weights) ← 旧版写法，传入 dict 时直接崩溃
         cfg['base_weights'] = np.asarray(
             cfg['base_weights'], dtype=np.float64
         ).ravel()
@@ -100,8 +95,6 @@ class MonteCarloAuditor:
         执行蒙特卡洛模拟并作出审核决策
         :param fact_score:  事实核查得分 [0,1]
         :param sem_scores:  语义检测三维得分 [brand, compliance, norm]
-        :return: 包含 mean/median/std/ci_95/pass_probability/
-                 review_probability/reject_probability/decision 的字典
         """
         sem_scores = np.asarray(sem_scores, dtype=np.float64).ravel()
         if sem_scores.shape[0] != 3:
@@ -168,9 +161,9 @@ class MonteCarloAuditor:
     ) -> Dict[str, Any]:
         """
         决策优先级（从高到低）：
-          ① 硬性否决 — brand/compliance 严重偏低 → REJECT
-          ② 硬性复核 — fact_score 有问题 / pass_prob 不足 → REVIEW
-          ③ 概率阈值 — 正常流程
+          硬性否决 — brand/compliance 严重偏低 → REJECT
+          硬性复核 — fact_score 有问题 / pass_prob 不足 → REVIEW
+          概率阈值 — 正常流程
         """
         cfg        = self.config
         brand      = float(sem_scores[0])
@@ -178,7 +171,7 @@ class MonteCarloAuditor:
         mean       = mc_result['mean']
         pass_prob  = mc_result['pass_probability']
 
-        # ── ① 硬性否决 ────────────────────────────────────────────────────────
+        #硬性否决
         single_thr = float(cfg['single_dim_reject'])
         avg_thr    = float(cfg['bc_avg_reject'])
 
@@ -201,7 +194,7 @@ class MonteCarloAuditor:
                 trigger='hard_reject',
             )
 
-        # ── ② 硬性复核 ────────────────────────────────────────────────────────
+        #硬性复核
         fact_floor    = float(cfg['fact_review_floor'])
         pass_prob_min = float(cfg['pass_prob_min'])
 
@@ -218,7 +211,7 @@ class MonteCarloAuditor:
                 trigger='hard_review',
             )
 
-        # ── ③ 概率阈值判断 ────────────────────────────────────────────────────
+        #概率阈值判断
         pass_thr   = float(cfg['pass_threshold'])
         review_thr = float(cfg['review_threshold'])
 
@@ -238,7 +231,7 @@ class MonteCarloAuditor:
             trigger='probability',
         )
 
-# ── 决策构造辅助函数 ──────────────────────────────────────────────────────────
+#决策构造辅助函数
 
 def _approve(reason: str, trigger: str) -> Dict[str, Any]:
     return {

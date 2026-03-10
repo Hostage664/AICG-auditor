@@ -1,1336 +1,462 @@
 {
-  "generated_at": "2026-03-10T15:42:09.457079",
+  "generated_at": "2026-03-10T16:23:55.990470",
   "total": 1,
   "audited": 1,
   "html_reports": [
-    "E:\\library-aigc-auditor\\output\\testcase3_report.html"
+    "E:\\library-aigc-auditor\\output\\testcase1_report.html"
   ],
   "results": [
     {
-      "file": "testcase3.txt",
+      "file": "testcase1.txt",
       "scores": {
-        "fact_score": 1.0,
-        "brand_score": 1.0,
+        "fact_score": 0.0,
+        "brand_score": 0.24377973874409997,
         "compliance_score": 1.0,
-        "norm_score": 0.5261497736598054
+        "norm_score": 0.49089981705643404
       },
-      "fact_issues": [],
+      "fact_issues": [
+        {
+          "rule_id": "FC008",
+          "rule_name": "违规词检查-绝对化用语",
+          "severity": "error",
+          "message": "包含绝对化用语，不符合规范要求",
+          "detail": "命中规则 '违规词检查-绝对化用语'"
+        }
+      ],
       "sem_matches": [
         {
-          "category": "规范表达参考",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.7134072780609131,
+          "category": "口语化表达",
+          "sentence": "赶紧来薅羊毛吧",
+          "matched": "薅羊毛",
+          "similarity": 0.8114646673202515,
           "weight": 1.0,
-          "w_sim": 0.7134072780609131,
-          "db_role": "whitelist"
+          "w_sim": 0.8114646673202515,
+          "db_role": "blacklist"
         },
         {
-          "category": "规范表达参考",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "请按规定使用电子资源",
-          "similarity": 0.6050558686256409,
-          "weight": 1.0,
-          "w_sim": 0.6050558686256409,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "请合理使用馆藏资源",
-          "similarity": 0.5585541129112244,
+          "category": "口语化表达",
+          "sentence": "手慢则无",
+          "matched": "手慢无",
+          "similarity": 0.8140408992767334,
           "weight": 0.9,
-          "w_sim": 0.502698701620102,
-          "db_role": "whitelist"
+          "w_sim": 0.7326368093490601,
+          "db_role": "blacklist"
         },
         {
-          "category": "规范表达参考",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.5733745098114014,
+          "category": "敏感词风险",
+          "sentence": "相当于白嫖对不对",
+          "matched": "白嫖",
+          "similarity": 0.7245593070983887,
           "weight": 1.0,
-          "w_sim": 0.5733745098114014,
-          "db_role": "whitelist"
+          "w_sim": 0.7245593070983887,
+          "db_role": "blacklist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
+          "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5589654445648193,
+          "similarity": 0.6045994162559509,
           "weight": 1.0,
-          "w_sim": 0.5589654445648193,
+          "w_sim": 0.6045994162559509,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
-          "matched": "仅供个人学习与研究使用",
-          "similarity": 0.4884704649448395,
-          "weight": 1.0,
-          "w_sim": 0.4884704649448395,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.6670718193054199,
-          "weight": 1.0,
-          "w_sim": 0.6670718193054199,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5940513610839844,
-          "weight": 1.0,
-          "w_sim": 0.5940513610839844,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
+          "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
           "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.502078115940094,
+          "similarity": 0.5706146955490112,
           "weight": 0.9,
-          "w_sim": 0.4518703043460846,
+          "w_sim": 0.5135532259941101,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "请遵守借阅规则",
-          "similarity": 0.5776510834693909,
-          "weight": 1.0,
-          "w_sim": 0.5776510834693909,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.5325407981872559,
-          "weight": 1.0,
-          "w_sim": 0.5325407981872559,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "维护良好阅览秩序",
-          "similarity": 0.527961790561676,
-          "weight": 0.9,
-          "w_sim": 0.47516561150550846,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.7346815466880798,
-          "weight": 1.0,
-          "w_sim": 0.7346815466880798,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "请合理使用馆藏资源",
-          "similarity": 0.6151184439659119,
-          "weight": 0.9,
-          "w_sim": 0.5536065995693207,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "仅供个人学习与研究使用",
-          "similarity": 0.5609673261642456,
-          "weight": 1.0,
-          "w_sim": 0.5609673261642456,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "中文资源方面",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.4888955056667328,
-          "weight": 1.0,
-          "w_sim": 0.4888955056667328,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "中文资源方面",
-          "matched": "请合理使用馆藏资源",
-          "similarity": 0.4624986946582794,
-          "weight": 0.9,
-          "w_sim": 0.4162488251924515,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "包括中国知网学术期刊全文数据库、万方学位论文数据库 及维普中文科技期刊数据库",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.48966795206069946,
-          "weight": 1.0,
-          "w_sim": 0.48966795206069946,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "包括中国知网学术期刊全文数据库、万方学位论文数据库 及维普中文科技期刊数据库",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.46875327825546265,
-          "weight": 1.0,
-          "w_sim": 0.46875327825546265,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "外文资源方面",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.48802420496940613,
-          "weight": 1.0,
-          "w_sim": 0.48802420496940613,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "包括Web of Science核心合集、 Elsevier ScienceDirect期刊全文平台及SpringerLink电子图书数据库",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5483062267303467,
-          "weight": 1.0,
-          "w_sim": 0.5483062267303467,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "包括Web of Science核心合集、 Elsevier ScienceDirect期刊全文平台及SpringerLink电子图书数据库",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.4714899957180023,
-          "weight": 1.0,
-          "w_sim": 0.4714899957180023,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "可基本满足全校各层次师生的科研文献需求",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.5449346899986267,
-          "weight": 1.0,
-          "w_sim": 0.5449346899986267,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "可基本满足全校各层次师生的科研文献需求",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5323344469070435,
-          "weight": 1.0,
-          "w_sim": 0.5323344469070435,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "可基本满足全校各层次师生的科研文献需求",
-          "matched": "仅供个人学习与研究使用",
-          "similarity": 0.49764150381088257,
-          "weight": 1.0,
-          "w_sim": 0.49764150381088257,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "请按规定使用电子资源",
-          "similarity": 0.6140745878219604,
-          "weight": 1.0,
-          "w_sim": 0.6140745878219604,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "未经授权不得转载或分发",
-          "similarity": 0.5506622195243835,
-          "weight": 1.0,
-          "w_sim": 0.5506622195243835,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.5190219879150391,
-          "weight": 1.0,
-          "w_sim": 0.5190219879150391,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.624906599521637,
-          "weight": 1.0,
-          "w_sim": 0.624906599521637,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
+          "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
           "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.5737385749816895,
+          "similarity": 0.5134608745574951,
           "weight": 1.0,
-          "w_sim": 0.5737385749816895,
+          "w_sim": 0.5134608745574951,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
-          "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.5231592655181885,
-          "weight": 0.9,
-          "w_sim": 0.47084333896636965,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校园网环境下可直接访问",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.5421996116638184,
-          "weight": 1.0,
-          "w_sim": 0.5421996116638184,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校园网环境下可直接访问",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.4798806309700012,
-          "weight": 1.0,
-          "w_sim": 0.4798806309700012,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校园网环境下可直接访问",
-          "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.4523954391479492,
-          "weight": 0.9,
-          "w_sim": 0.4071558952331543,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校外用户请通过学校统一身份认证平台登录SSL VPN或CARSI联盟后使用",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.5245529413223267,
-          "weight": 1.0,
-          "w_sim": 0.5245529413223267,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校外用户请通过学校统一身份认证平台登录SSL VPN或CARSI联盟后使用",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.47883033752441406,
-          "weight": 1.0,
-          "w_sim": 0.47883033752441406,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "校外用户请通过学校统一身份认证平台登录SSL VPN或CARSI联盟后使用",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.4621172547340393,
-          "weight": 1.0,
-          "w_sim": 0.4621172547340393,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.6488814353942871,
-          "weight": 1.0,
-          "w_sim": 0.6488814353942871,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.6138623952865601,
-          "weight": 0.9,
-          "w_sim": 0.5524761557579041,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "请按规定使用电子资源",
-          "similarity": 0.5821330547332764,
-          "weight": 1.0,
-          "w_sim": 0.5821330547332764,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "三、文献传递与馆际互借服务 对于本馆未收录的文献资源",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.6187963485717773,
-          "weight": 1.0,
-          "w_sim": 0.6187963485717773,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "三、文献传递与馆际互借服务 对于本馆未收录的文献资源",
-          "matched": "请合理使用馆藏资源",
-          "similarity": 0.5904755592346191,
-          "weight": 0.9,
-          "w_sim": 0.5314280033111572,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "三、文献传递与馆际互借服务 对于本馆未收录的文献资源",
-          "matched": "请遵守借阅规则",
-          "similarity": 0.48870348930358887,
-          "weight": 1.0,
-          "w_sim": 0.48870348930358887,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5943161845207214,
-          "weight": 1.0,
-          "w_sim": 0.5943161845207214,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.5768615007400513,
-          "weight": 1.0,
-          "w_sim": 0.5768615007400513,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.5015813708305359,
-          "weight": 1.0,
-          "w_sim": 0.5015813708305359,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "工作人员将在三至七个工作日内完成处理",
-          "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.466116338968277,
-          "weight": 0.9,
-          "w_sim": 0.41950470507144927,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "工作人员将在三至七个工作日内完成处理",
+          "sentence": "限时福利千万别错过",
           "matched": "请于规定时限内归还",
-          "similarity": 0.46346724033355713,
+          "similarity": 0.45003455877304077,
           "weight": 1.0,
-          "w_sim": 0.46346724033355713,
+          "w_sim": 0.45003455877304077,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.520799994468689,
-          "weight": 1.0,
-          "w_sim": 0.520799994468689,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.5007296800613403,
+          "sentence": "我们馆藏超过五千万册图书 全国最多",
+          "matched": "请合理使用馆藏资源",
+          "similarity": 0.4877762198448181,
           "weight": 0.9,
-          "w_sim": 0.4506567120552063,
+          "w_sim": 0.4389985978603363,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.48509523272514343,
-          "weight": 1.0,
-          "w_sim": 0.48509523272514343,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "该服务面向全体在校师生开放",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.5128303170204163,
-          "weight": 1.0,
-          "w_sim": 0.5128303170204163,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "该服务面向全体在校师生开放",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.4833647310733795,
-          "weight": 1.0,
-          "w_sim": 0.4833647310733795,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "该服务面向全体在校师生开放",
+          "sentence": "我们馆藏超过五千万册图书 全国最多",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.46013250946998596,
+          "similarity": 0.47143784165382385,
           "weight": 1.0,
-          "w_sim": 0.46013250946998596,
+          "w_sim": 0.47143784165382385,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "请按规定使用电子资源",
-          "similarity": 0.6676493883132935,
-          "weight": 1.0,
-          "w_sim": 0.6676493883132935,
+          "sentence": "每天二十四小时不间断开放",
+          "matched": "本馆开放时间如下",
+          "similarity": 0.48451265692710876,
+          "weight": 0.9,
+          "w_sim": 0.4360613912343979,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "仅供个人学习与研究使用",
-          "similarity": 0.5871540307998657,
+          "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+          "matched": "读者可凭校园卡办理借阅手续",
+          "similarity": 0.5940368175506592,
           "weight": 1.0,
-          "w_sim": 0.5871540307998657,
+          "w_sim": 0.5940368175506592,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5443034768104553,
-          "weight": 1.0,
-          "w_sim": 0.5443034768104553,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "未经授权不得转载或分发",
-          "similarity": 0.543695330619812,
-          "weight": 1.0,
-          "w_sim": 0.543695330619812,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "请按规定使用电子资源",
-          "similarity": 0.4705764055252075,
-          "weight": 1.0,
-          "w_sim": 0.4705764055252075,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.45741671323776245,
-          "weight": 1.0,
-          "w_sim": 0.45741671323776245,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "上述行为违反数据库使用协议及 著作权法 相关规定",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.6967024803161621,
-          "weight": 1.0,
-          "w_sim": 0.6967024803161621,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "上述行为违反数据库使用协议及 著作权法 相关规定",
+          "sentence": "现在凭借书证可以直接在淘宝上免费买书",
           "matched": "请遵守借阅规则",
-          "similarity": 0.4609557092189789,
+          "similarity": 0.5301166772842407,
           "weight": 1.0,
-          "w_sim": 0.4609557092189789,
+          "w_sim": 0.5301166772842407,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
+          "sentence": "现在凭借书证可以直接在淘宝上免费买书",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5270979404449463,
+          "similarity": 0.48730164766311646,
           "weight": 1.0,
-          "w_sim": 0.5270979404449463,
+          "w_sim": 0.48730164766311646,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
-          "matched": "数据库使用须遵守相关协议",
-          "similarity": 0.5216751098632812,
-          "weight": 1.0,
-          "w_sim": 0.5216751098632812,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
-          "matched": "读者可凭校园卡办理借阅手续",
-          "similarity": 0.5127484202384949,
-          "weight": 1.0,
-          "w_sim": 0.5127484202384949,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
+          "sentence": "买完之后捐给图书馆就行啦",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.8418513536453247,
+          "similarity": 0.5859358310699463,
           "weight": 1.0,
-          "w_sim": 0.8418513536453247,
+          "w_sim": 0.5859358310699463,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
-          "matched": "欢迎广大师生使用",
-          "similarity": 0.643781304359436,
-          "weight": 1.0,
-          "w_sim": 0.643781304359436,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
+          "sentence": "买完之后捐给图书馆就行啦",
           "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.5787901282310486,
+          "similarity": 0.5823036432266235,
           "weight": 0.9,
-          "w_sim": 0.5209111154079438,
+          "w_sim": 0.5240732789039612,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆将持续优化服务质量",
+          "sentence": "买完之后捐给图书馆就行啦",
+          "matched": "请合理使用馆藏资源",
+          "similarity": 0.5280790328979492,
+          "weight": 0.9,
+          "w_sim": 0.4752711296081543,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "这个福利只有我们图书馆有",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.6373738050460815,
+          "similarity": 0.5300384759902954,
           "weight": 1.0,
-          "w_sim": 0.6373738050460815,
+          "w_sim": 0.5300384759902954,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆将持续优化服务质量",
+          "sentence": "这个福利只有我们图书馆有",
           "matched": "如有疑问请联系图书馆工作人员",
-          "similarity": 0.5300090312957764,
+          "similarity": 0.4801413416862488,
           "weight": 0.9,
-          "w_sim": 0.47700812816619875,
+          "w_sim": 0.4321272075176239,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "图书馆将持续优化服务质量",
-          "matched": "维护良好阅览秩序",
-          "similarity": 0.523951530456543,
-          "weight": 0.9,
-          "w_sim": 0.4715563774108887,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "规范表达参考",
-          "sentence": "为全校科研与教学工作提供有力支撑",
+          "sentence": "我们图书馆的电子资源已经完全破解了Elsevier和Springer的 付费墙",
           "matched": "图书馆提供学术资源服务",
-          "similarity": 0.5419307947158813,
+          "similarity": 0.5504574775695801,
           "weight": 1.0,
-          "w_sim": 0.5419307947158813,
+          "w_sim": 0.5504574775695801,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "为全校科研与教学工作提供有力支撑",
+          "sentence": "所有SCI论文现在都可以免费下载",
+          "matched": "图书馆提供学术资源服务",
+          "similarity": 0.49387407302856445,
+          "weight": 1.0,
+          "w_sim": 0.49387407302856445,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "所有SCI论文现在都可以免费下载",
           "matched": "仅供个人学习与研究使用",
-          "similarity": 0.4720284044742584,
+          "similarity": 0.4846312403678894,
           "weight": 1.0,
-          "w_sim": 0.4720284044742584,
+          "w_sim": 0.4846312403678894,
           "db_role": "whitelist"
         },
         {
           "category": "规范表达参考",
-          "sentence": "为全校科研与教学工作提供有力支撑",
+          "sentence": "所有SCI论文现在都可以免费下载",
+          "matched": "未经授权不得转载或分发",
+          "similarity": 0.4756549000740051,
+          "weight": 1.0,
+          "w_sim": 0.4756549000740051,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "导师再也不用花钱买文献了",
+          "matched": "图书馆提供学术资源服务",
+          "similarity": 0.4800695776939392,
+          "weight": 1.0,
+          "w_sim": 0.4800695776939392,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "导师再也不用花钱买文献了",
+          "matched": "仅供个人学习与研究使用",
+          "similarity": 0.45604947209358215,
+          "weight": 1.0,
+          "w_sim": 0.45604947209358215,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "扫码关注我们公众号",
           "matched": "欢迎广大师生使用",
-          "similarity": 0.4533798396587372,
+          "similarity": 0.45125964283943176,
           "weight": 1.0,
-          "w_sim": 0.4533798396587372,
+          "w_sim": 0.45125964283943176,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "为规范管理",
-          "similarity": 0.5727769136428833,
+          "category": "规范表达参考",
+          "sentence": "截图转发到五个群就可以参与",
+          "matched": "未经授权不得转载或分发",
+          "similarity": 0.48105388879776,
+          "weight": 1.0,
+          "w_sim": 0.48105388879776,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "名额有限先到先得",
+          "matched": "请于规定时限内归还",
+          "similarity": 0.45086193084716797,
+          "weight": 1.0,
+          "w_sim": 0.45086193084716797,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "借书超期罚款已经全部取消啦",
+          "matched": "逾期将产生滞纳金",
+          "similarity": 0.5954357385635376,
           "weight": 0.9,
-          "w_sim": 0.515499222278595,
+          "w_sim": 0.5358921647071838,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "制定本使用指引",
-          "similarity": 0.5337513089179993,
+          "category": "规范表达参考",
+          "sentence": "借书超期罚款已经全部取消啦",
+          "matched": "请于规定时限内归还",
+          "similarity": 0.5648088455200195,
           "weight": 1.0,
-          "w_sim": 0.5337513089179993,
+          "w_sim": 0.5648088455200195,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "图书馆学术资源服务规范使用指引 为规范电子学术资源的使用行为",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5171658396720886,
+          "category": "规范表达参考",
+          "sentence": "借书超期罚款已经全部取消啦",
+          "matched": "请遵守借阅规则",
+          "similarity": 0.5633549690246582,
           "weight": 1.0,
-          "w_sim": 0.5171658396720886,
+          "w_sim": 0.5633549690246582,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.7708104848861694,
+          "category": "规范表达参考",
+          "sentence": "以后借多久都没事",
+          "matched": "请遵守借阅规则",
+          "similarity": 0.5367861986160278,
           "weight": 1.0,
-          "w_sim": 0.7708104848861694,
+          "w_sim": 0.5367861986160278,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
-          "matched": "保障师生合法权益",
-          "similarity": 0.5705831050872803,
+          "category": "规范表达参考",
+          "sentence": "以后借多久都没事",
+          "matched": "请于规定时限内归还",
+          "similarity": 0.5254360437393188,
           "weight": 1.0,
-          "w_sim": 0.5705831050872803,
+          "w_sim": 0.5254360437393188,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "保障广大师生的文献检索与学术研究需求",
-          "matched": "提升读者服务体验",
-          "similarity": 0.4589020013809204,
-          "weight": 0.8,
-          "w_sim": 0.36712160110473635,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.6668524742126465,
-          "weight": 1.0,
-          "w_sim": 0.6668524742126465,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.523271381855011,
-          "weight": 1.0,
-          "w_sim": 0.523271381855011,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据现行数据库使用协议及相关法律法规",
-          "matched": "依据法律法规",
-          "similarity": 0.5154496431350708,
-          "weight": 1.0,
-          "w_sim": 0.5154496431350708,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "制定本使用指引",
-          "matched": "制定本使用指引",
-          "similarity": 0.864168643951416,
-          "weight": 1.0,
-          "w_sim": 0.864168643951416,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "制定本使用指引",
-          "matched": "特制定本办法",
-          "similarity": 0.56884765625,
-          "weight": 1.0,
-          "w_sim": 0.56884765625,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "制定本使用指引",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.45115721225738525,
-          "weight": 1.0,
-          "w_sim": 0.45115721225738525,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "保障师生合法权益",
-          "similarity": 0.5433903932571411,
-          "weight": 1.0,
-          "w_sim": 0.5433903932571411,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "请各部门遵照执行",
-          "similarity": 0.49440711736679077,
+          "category": "规范表达参考",
+          "sentence": "以后借多久都没事",
+          "matched": "逾期将产生滞纳金",
+          "similarity": 0.49137479066848755,
           "weight": 0.9,
-          "w_sim": 0.4449664056301117,
+          "w_sim": 0.4422373116016388,
           "db_role": "whitelist"
         },
         {
-          "category": "学术正式用语",
-          "sentence": "请全校师生认真阅读并严格遵守",
-          "matched": "为规范管理",
-          "similarity": 0.45908308029174805,
+          "category": "规范表达参考",
+          "sentence": "图书馆以后永远不会收任何费用",
+          "matched": "图书馆提供学术资源服务",
+          "similarity": 0.521823525428772,
+          "weight": 1.0,
+          "w_sim": 0.521823525428772,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "图书馆以后永远不会收任何费用",
+          "matched": "如有疑问请联系图书馆工作人员",
+          "similarity": 0.5038325786590576,
           "weight": 0.9,
-          "w_sim": 0.41317477226257326,
+          "w_sim": 0.45344932079315187,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "规范表达参考",
+          "sentence": "图书馆以后永远不会收任何费用",
+          "matched": "请合理使用馆藏资源",
+          "similarity": 0.46292176842689514,
+          "weight": 0.9,
+          "w_sim": 0.41662959158420565,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.6349563598632812,
-          "weight": 1.0,
-          "w_sim": 0.6349563598632812,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "提升读者服务体验",
-          "similarity": 0.5139099955558777,
-          "weight": 0.8,
-          "w_sim": 0.41112799644470216,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "一、馆藏资源概览 图书馆现订阅学术数据库覆盖人文社科、理工医农等主要学科领域",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.4759957492351532,
-          "weight": 1.0,
-          "w_sim": 0.4759957492351532,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "中文资源方面",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.45012786984443665,
-          "weight": 1.0,
-          "w_sim": 0.45012786984443665,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "包括中国知网学术期刊全文数据库、万方学位论文数据库 及维普中文科技期刊数据库",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5176218748092651,
-          "weight": 1.0,
-          "w_sim": 0.5176218748092651,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "外文资源方面",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.45057523250579834,
-          "weight": 1.0,
-          "w_sim": 0.45057523250579834,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "包括Web of Science核心合集、 Elsevier ScienceDirect期刊全文平台及SpringerLink电子图书数据库",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5341442823410034,
-          "weight": 1.0,
-          "w_sim": 0.5341442823410034,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "包括Web of Science核心合集、 Elsevier ScienceDirect期刊全文平台及SpringerLink电子图书数据库",
-          "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.4595998525619507,
-          "weight": 1.0,
-          "w_sim": 0.4595998525619507,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "可基本满足全校各层次师生的科研文献需求",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5869655609130859,
-          "weight": 1.0,
-          "w_sim": 0.5869655609130859,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "可基本满足全校各层次师生的科研文献需求",
-          "matched": "保障师生合法权益",
-          "similarity": 0.4544925391674042,
-          "weight": 1.0,
-          "w_sim": 0.4544925391674042,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.5345975160598755,
-          "weight": 1.0,
-          "w_sim": 0.5345975160598755,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "保障师生合法权益",
-          "similarity": 0.5290263295173645,
-          "weight": 1.0,
-          "w_sim": 0.5290263295173645,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "二、合法授权访问说明 上述所有电子资源均在合法授权范围内提供服务",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.4855257272720337,
-          "weight": 1.0,
-          "w_sim": 0.4855257272720337,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.515199601650238,
-          "weight": 1.0,
-          "w_sim": 0.515199601650238,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.51166170835495,
-          "weight": 1.0,
-          "w_sim": 0.51166170835495,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆依据协议向 全校在读学生及在职教职工开放使用权限",
-          "matched": "保障师生合法权益",
-          "similarity": 0.46769195795059204,
-          "weight": 1.0,
-          "w_sim": 0.46769195795059204,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "校园网环境下可直接访问",
-          "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.8173841834068298,
-          "weight": 1.0,
-          "w_sim": 0.8173841834068298,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "校外用户请通过学校统一身份认证平台登录SSL VPN或CARSI联盟后使用",
-          "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.5723065137863159,
-          "weight": 1.0,
-          "w_sim": 0.5723065137863159,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "校外用户请通过学校统一身份认证平台登录SSL VPN或CARSI联盟后使用",
-          "matched": "提升读者服务体验",
-          "similarity": 0.45437198877334595,
-          "weight": 0.8,
-          "w_sim": 0.3634975910186768,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.6156785488128662,
-          "weight": 1.0,
-          "w_sim": 0.6156785488128662,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "制定本使用指引",
-          "similarity": 0.5061758756637573,
-          "weight": 1.0,
-          "w_sim": 0.5061758756637573,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "具体操作流程详见图书馆官方网站 电子资源校外访问指南 专栏",
-          "matched": "提升读者服务体验",
-          "similarity": 0.48363202810287476,
-          "weight": 0.8,
-          "w_sim": 0.3869056224822998,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "三、文献传递与馆际互借服务 对于本馆未收录的文献资源",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5427481532096863,
-          "weight": 1.0,
-          "w_sim": 0.5427481532096863,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5428844094276428,
-          "weight": 1.0,
-          "w_sim": 0.5428844094276428,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "提升读者服务体验",
-          "similarity": 0.4817168414592743,
-          "weight": 0.8,
-          "w_sim": 0.38537347316741943,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "师生可通过CALIS馆际互借平台或 中国高校人文社会科学文献中心 CASHL 提交文献传递申请",
-          "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.4772275686264038,
-          "weight": 1.0,
-          "w_sim": 0.4772275686264038,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "申请提交后",
-          "matched": "申请提交后将由相关部门审核",
-          "similarity": 0.6846213340759277,
-          "weight": 1.0,
-          "w_sim": 0.6846213340759277,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "申请提交后",
+          "sentence": "超级好消息来啦",
           "matched": "特此通知",
-          "similarity": 0.456277072429657,
+          "similarity": 0.47921332716941833,
           "weight": 1.0,
-          "w_sim": 0.456277072429657,
+          "w_sim": 0.47921332716941833,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "工作人员将在三至七个工作日内完成处理",
-          "matched": "请各部门遵照执行",
-          "similarity": 0.48220664262771606,
-          "weight": 0.9,
-          "w_sim": 0.43398597836494446,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "工作人员将在三至七个工作日内完成处理",
-          "matched": "申请提交后将由相关部门审核",
-          "similarity": 0.47078195214271545,
-          "weight": 1.0,
-          "w_sim": 0.47078195214271545,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "文献检索与学术研究",
-          "similarity": 0.5504701137542725,
-          "weight": 1.0,
-          "w_sim": 0.5504701137542725,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "申请提交后将由相关部门审核",
-          "similarity": 0.496539831161499,
-          "weight": 1.0,
-          "w_sim": 0.496539831161499,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "文献将以电子版形式发送至申请人指定邮箱",
-          "matched": "提升读者服务体验",
-          "similarity": 0.45185673236846924,
-          "weight": 0.8,
-          "w_sim": 0.3614853858947754,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "该服务面向全体在校师生开放",
-          "matched": "保障师生合法权益",
-          "similarity": 0.5349704027175903,
-          "weight": 1.0,
-          "w_sim": 0.5349704027175903,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "该服务面向全体在校师生开放",
+          "sentence": "图书馆现在可以免费下载知网、万方所有论文啦",
           "matched": "校园网环境下凭账号登录访问",
-          "similarity": 0.4719356298446655,
+          "similarity": 0.46219849586486816,
           "weight": 1.0,
-          "w_sim": 0.4719356298446655,
+          "w_sim": 0.46219849586486816,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "该服务面向全体在校师生开放",
-          "matched": "提升读者服务体验",
-          "similarity": 0.4614188075065613,
-          "weight": 0.8,
-          "w_sim": 0.36913504600524905,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "知识产权保护",
-          "similarity": 0.5918740630149841,
+          "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+          "matched": "校园网环境下凭账号登录访问",
+          "similarity": 0.46876516938209534,
           "weight": 1.0,
-          "w_sim": 0.5918740630149841,
+          "w_sim": 0.46876516938209534,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.5221918225288391,
-          "weight": 1.0,
-          "w_sim": 0.5221918225288391,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "四、知识产权与使用规范声明 所有电子资源仅限用于个人学习及非商业性学术研究目的",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.5086424350738525,
-          "weight": 1.0,
-          "w_sim": 0.5086424350738525,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "本规定自发布之日起执行",
-          "similarity": 0.4879339635372162,
-          "weight": 1.0,
-          "w_sim": 0.4879339635372162,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "请各部门遵照执行",
-          "similarity": 0.4761330485343933,
+          "sentence": "现在凭借书证可以直接在淘宝上免费买书",
+          "matched": "根据相关规定",
+          "similarity": 0.45130079984664917,
           "weight": 0.9,
-          "w_sim": 0.42851974368095397,
+          "w_sim": 0.4061707198619843,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "严禁以任何形式进行批量下载、系统性爬取、商业转售或二次分发",
-          "matched": "如有违反将依规处理",
-          "similarity": 0.47489669919013977,
-          "weight": 0.9,
-          "w_sim": 0.4274070292711258,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "上述行为违反数据库使用协议及 著作权法 相关规定",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.6789556741714478,
-          "weight": 1.0,
-          "w_sim": 0.6789556741714478,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "上述行为违反数据库使用协议及 著作权法 相关规定",
-          "matched": "如有违反将依规处理",
-          "similarity": 0.530555248260498,
-          "weight": 0.9,
-          "w_sim": 0.47749972343444824,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "上述行为违反数据库使用协议及 著作权法 相关规定",
-          "matched": "按照相关协议合理使用",
-          "similarity": 0.5267242193222046,
-          "weight": 1.0,
-          "w_sim": 0.5267242193222046,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
-          "matched": "如有违反将依规处理",
-          "similarity": 0.560906708240509,
-          "weight": 0.9,
-          "w_sim": 0.5048160374164582,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
-          "matched": "遵守数据库商协议规定",
-          "similarity": 0.5413469672203064,
-          "weight": 1.0,
-          "w_sim": 0.5413469672203064,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆将依据协议条款及校规对违规行为进行处理",
-          "matched": "为规范管理",
-          "similarity": 0.5174901485443115,
-          "weight": 0.9,
-          "w_sim": 0.4657411336898804,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "情节严重者将承担相应法律责任",
-          "matched": "如有违反将依规处理",
-          "similarity": 0.4670395851135254,
-          "weight": 0.9,
-          "w_sim": 0.4203356266021729,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
+          "sentence": "所有SCI论文现在都可以免费下载",
           "matched": "文献检索与学术研究",
-          "similarity": 0.5745947957038879,
+          "similarity": 0.4906426668167114,
           "weight": 1.0,
-          "w_sim": 0.5745947957038879,
+          "w_sim": 0.4906426668167114,
           "db_role": "whitelist"
         },
         {
           "category": "学术正式用语",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
-          "matched": "提升读者服务体验",
-          "similarity": 0.5526821613311768,
-          "weight": 0.8,
-          "w_sim": 0.44214572906494143,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "欢迎广大师生使用图书馆提供的学术资源服务",
-          "matched": "保障师生合法权益",
-          "similarity": 0.5286720991134644,
-          "weight": 1.0,
-          "w_sim": 0.5286720991134644,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆将持续优化服务质量",
-          "matched": "持续优化服务质量",
-          "similarity": 0.7034153342247009,
-          "weight": 0.8,
-          "w_sim": 0.5627322673797608,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "图书馆将持续优化服务质量",
-          "matched": "提升读者服务体验",
-          "similarity": 0.5900305509567261,
-          "weight": 0.8,
-          "w_sim": 0.47202444076538086,
-          "db_role": "whitelist"
-        },
-        {
-          "category": "学术正式用语",
-          "sentence": "为全校科研与教学工作提供有力支撑",
+          "sentence": "导师再也不用花钱买文献了",
           "matched": "文献检索与学术研究",
-          "similarity": 0.5528202056884766,
+          "similarity": 0.5444984436035156,
           "weight": 1.0,
-          "w_sim": 0.5528202056884766,
+          "w_sim": 0.5444984436035156,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "学术正式用语",
+          "sentence": "截图转发到五个群就可以参与",
+          "matched": "提升读者服务体验",
+          "similarity": 0.46223562955856323,
+          "weight": 0.8,
+          "w_sim": 0.3697885036468506,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "学术正式用语",
+          "sentence": "截图转发到五个群就可以参与",
+          "matched": "校园网环境下凭账号登录访问",
+          "similarity": 0.45952916145324707,
+          "weight": 1.0,
+          "w_sim": 0.45952916145324707,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "学术正式用语",
+          "sentence": "借书超期罚款已经全部取消啦",
+          "matched": "如有违反将依规处理",
+          "similarity": 0.5409474968910217,
+          "weight": 0.9,
+          "w_sim": 0.48685274720191957,
+          "db_role": "whitelist"
+        },
+        {
+          "category": "学术正式用语",
+          "sentence": "借书超期罚款已经全部取消啦",
+          "matched": "依据法律法规",
+          "similarity": 0.46965575218200684,
+          "weight": 1.0,
+          "w_sim": 0.46965575218200684,
           "db_role": "whitelist"
         }
       ],
       "monte_carlo": {
-        "mean": 0.9328510410762468,
-        "median": 0.9444423986228008,
-        "std": 0.044319380272474916,
+        "mean": 0.31086054205722335,
+        "median": 0.30841244742607354,
+        "std": 0.09871481112115146,
         "ci_95": [
-          0.8303034671573959,
-          0.9817179648293362
+          0.13999692063702784,
+          0.5153050879285563
         ],
         "n_simulations": 0,
         "pass_threshold": 0.82,
         "review_threshold": 0.6,
-        "pass_probability": 0.9838,
-        "review_probability": 0.0162,
-        "reject_probability": 0.0,
-        "decision": "建议通过",
-        "action": "APPROVE",
-        "reason": "均值 0.933 ≥ 通过阈值 0.82",
-        "trigger": "probability",
+        "pass_probability": 0.0,
+        "review_probability": 0.003,
+        "reject_probability": 0.997,
+        "decision": "建议重写",
+        "action": "REJECT",
+        "reason": "品牌调性分 0.244 < 否决阈值 0.45，内容风格严重不符，建议重写",
+        "trigger": "hard_reject",
         "score_distribution": {}
       }
     }

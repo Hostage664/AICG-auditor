@@ -28,7 +28,7 @@ os.chdir(_PROJECT_ROOT)
 from fact_checker     import FactChecker
 from semantic_checker import SemanticChecker
 from monte_carlo      import MonteCarloAuditor
-from visualizer       import AuditVisualizer   # 接入 visualizer
+from visualizer       import AuditVisualizer
 
 # ── 日志初始化 ────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -139,14 +139,14 @@ def _audit_single(
             'review_probability': float(mc_result.get('review_probability', 0.0)),
             'reject_probability': float(mc_result.get('reject_probability', 0.0)),
 
-            # ── 决策（已解包为字符串）──────────────────────────────────────
+            # ── 决策──────────────────────────────────────
             'decision':           mc_result['decision']['recommendation'],
             'action':             mc_result['decision']['action'],
             'reason':             mc_result['decision'].get('reason',  ''),
             'trigger':            mc_result['decision'].get('trigger', ''),
 
-            # ── 分布数据（visualizer 绘图核心）────────────────────────────
-            'score_distribution': mc_result.get('score_distribution', {}),  # ★ 补齐
+            # ── 分布数据────────────────────────────
+            'score_distribution': mc_result.get('score_distribution', {}),
         },
     }
 

@@ -1,0 +1,860 @@
+{
+  "file": "testcase2.txt",
+  "scores": {
+    "fact_score": 0.0,
+    "brand_score": 0.4919114917516708,
+    "compliance_score": 1.0,
+    "norm_score": 0.47975239892338606
+  },
+  "fact_issues": [
+    {
+      "rule_id": "FC002",
+      "rule_name": "借阅册数检查",
+      "severity": "error",
+      "message": "单次借阅册数应在1-30册之间，请核实",
+      "detail": "100.0 > 最大值 30.0"
+    },
+    {
+      "rule_id": "FC003",
+      "rule_name": "借阅天数检查",
+      "severity": "error",
+      "message": "借阅天数应在1-60天之间，请核实",
+      "detail": "90.0 > 最大值 60.0"
+    },
+    {
+      "rule_id": "FC004",
+      "rule_name": "滞纳金检查",
+      "severity": "error",
+      "message": "滞纳金标准应不超过0.5元/天，请核实",
+      "detail": "1.5 > 最大值 0.5"
+    },
+    {
+      "rule_id": "FC008",
+      "rule_name": "违规词检查-绝对化用语",
+      "severity": "error",
+      "message": "包含绝对化用语，不符合规范要求",
+      "detail": "命中规则 '违规词检查-绝对化用语'"
+    },
+    {
+      "rule_id": "FC009",
+      "rule_name": "座位数量检查",
+      "severity": "warning",
+      "message": "座位数量描述异常，请核实",
+      "detail": "100000.0 > 最大值 5000.0"
+    }
+  ],
+  "sem_matches": [
+    {
+      "category": "口语化表达",
+      "sentence": "超好用的",
+      "matched": "超好用",
+      "similarity": 0.747053325176239,
+      "weight": 0.7,
+      "w_sim": 0.5229373276233673,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "口语化表达",
+      "sentence": "强烈推荐大家来",
+      "matched": "良心推荐",
+      "similarity": 0.6165496110916138,
+      "weight": 0.8,
+      "w_sim": 0.49323968887329106,
+      "db_role": "blacklist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "本馆开放时间如下",
+      "similarity": 0.6503909826278687,
+      "weight": 0.9,
+      "w_sim": 0.5853518843650818,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.613182544708252,
+      "weight": 1.0,
+      "w_sim": 0.613182544708252,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.5912659764289856,
+      "weight": 1.0,
+      "w_sim": 0.5912659764289856,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "周末也照常开放",
+      "matched": "本馆开放时间如下",
+      "similarity": 0.4802762567996979,
+      "weight": 0.9,
+      "w_sim": 0.4322486311197281,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "反正大家去了再说吧",
+      "matched": "请勿在馆内大声喧哗",
+      "similarity": 0.4516167640686035,
+      "weight": 0.8,
+      "w_sim": 0.36129341125488285,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.6866009831428528,
+      "weight": 1.0,
+      "w_sim": 0.6866009831428528,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.6182600855827332,
+      "weight": 1.0,
+      "w_sim": 0.6182600855827332,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "维护良好阅览秩序",
+      "similarity": 0.488031268119812,
+      "weight": 0.9,
+      "w_sim": 0.43922814130783083,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "时间嘛大概是90天左右",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.4523288607597351,
+      "weight": 1.0,
+      "w_sim": 0.4523288607597351,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "时间嘛大概是90天左右",
+      "matched": "本馆开放时间如下",
+      "similarity": 0.4516420364379883,
+      "weight": 0.9,
+      "w_sim": 0.4064778327941895,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "续借的话可以无限续",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5281080603599548,
+      "weight": 1.0,
+      "w_sim": 0.5281080603599548,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "续借的话可以无限续",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.4955536127090454,
+      "weight": 1.0,
+      "w_sim": 0.4955536127090454,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "续借的话可以无限续",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.48576509952545166,
+      "weight": 1.0,
+      "w_sim": 0.48576509952545166,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "电子资源也能借",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.6701265573501587,
+      "weight": 1.0,
+      "w_sim": 0.6701265573501587,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "电子资源也能借",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.4826931357383728,
+      "weight": 1.0,
+      "w_sim": 0.4826931357383728,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "电子资源也能借",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.47760945558547974,
+      "weight": 0.9,
+      "w_sim": 0.42984851002693175,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "期刊数据库随便用",
+      "matched": "数据库使用须遵守相关协议",
+      "similarity": 0.5529411435127258,
+      "weight": 1.0,
+      "w_sim": 0.5529411435127258,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "期刊数据库随便用",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.458664208650589,
+      "weight": 1.0,
+      "w_sim": 0.458664208650589,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "三、证件办理 办证需要带身份证",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.4652206003665924,
+      "weight": 1.0,
+      "w_sim": 0.4652206003665924,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "学生证也行",
+      "matched": "读者可凭校园卡办理借阅手续",
+      "similarity": 0.5009663701057434,
+      "weight": 1.0,
+      "w_sim": 0.5009663701057434,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "学生证也行",
+      "matched": "欢迎广大师生使用",
+      "similarity": 0.45564699172973633,
+      "weight": 1.0,
+      "w_sim": 0.45564699172973633,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "学生证也行",
+      "matched": "仅供个人学习与研究使用",
+      "similarity": 0.452298104763031,
+      "weight": 1.0,
+      "w_sim": 0.452298104763031,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "不过听说有时候不用交",
+      "matched": "未经授权不得转载或分发",
+      "similarity": 0.46555960178375244,
+      "weight": 1.0,
+      "w_sim": 0.46555960178375244,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "去问问工作人员就行了",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.6169494390487671,
+      "weight": 0.9,
+      "w_sim": 0.5552544951438904,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "联系电话：13800138000",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5460565090179443,
+      "weight": 0.9,
+      "w_sim": 0.4914508581161499,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "联系电话：13800138000",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.4560798406600952,
+      "weight": 1.0,
+      "w_sim": 0.4560798406600952,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "或者打0431 1234567也可以",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.45399343967437744,
+      "weight": 1.0,
+      "w_sim": 0.45399343967437744,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "四、还书与罚款 超期还书要交滞纳金",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.6844373345375061,
+      "weight": 0.9,
+      "w_sim": 0.6159936010837556,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "四、还书与罚款 超期还书要交滞纳金",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5777865648269653,
+      "weight": 1.0,
+      "w_sim": 0.5777865648269653,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "四、还书与罚款 超期还书要交滞纳金",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.46549201011657715,
+      "weight": 1.0,
+      "w_sim": 0.46549201011657715,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "超期太久的话可能要赔偿书价",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.5505724549293518,
+      "weight": 0.9,
+      "w_sim": 0.49551520943641664,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "超期太久的话可能要赔偿书价",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.5372850298881531,
+      "weight": 1.0,
+      "w_sim": 0.5372850298881531,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "超期太久的话可能要赔偿书价",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.4618866443634033,
+      "weight": 1.0,
+      "w_sim": 0.4618866443634033,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "严重的赔个几千块也有可能",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.47383344173431396,
+      "weight": 0.9,
+      "w_sim": 0.4264500975608826,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "反正别超期就对了",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.5032920241355896,
+      "weight": 0.9,
+      "w_sim": 0.4529628217220307,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "反正别超期就对了",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.4832337498664856,
+      "weight": 1.0,
+      "w_sim": 0.4832337498664856,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "五、馆藏资源 我们馆有藏书超过5000万册",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.6562020778656006,
+      "weight": 0.9,
+      "w_sim": 0.5905818700790405,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "五、馆藏资源 我们馆有藏书超过5000万册",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5643134117126465,
+      "weight": 1.0,
+      "w_sim": 0.5643134117126465,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "五、馆藏资源 我们馆有藏书超过5000万册",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.4920503497123718,
+      "weight": 0.9,
+      "w_sim": 0.44284531474113464,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "是全国最好的图书馆之一",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5638582706451416,
+      "weight": 1.0,
+      "w_sim": 0.5638582706451416,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "是全国最好的图书馆之一",
+      "matched": "维护良好阅览秩序",
+      "similarity": 0.5088564157485962,
+      "weight": 0.9,
+      "w_sim": 0.4579707741737366,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "是全国最好的图书馆之一",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5086891651153564,
+      "weight": 0.9,
+      "w_sim": 0.4578202486038208,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "各种资源都有",
+      "matched": "请合理使用馆藏资源",
+      "similarity": 0.560785174369812,
+      "weight": 0.9,
+      "w_sim": 0.5047066569328308,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "各种资源都有",
+      "matched": "请按规定使用电子资源",
+      "similarity": 0.5460936427116394,
+      "weight": 1.0,
+      "w_sim": 0.5460936427116394,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "各种资源都有",
+      "matched": "图书馆提供学术资源服务",
+      "similarity": 0.5369951128959656,
+      "weight": 1.0,
+      "w_sim": 0.5369951128959656,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "六、自习座位 阅览室大概有100000个座位",
+      "matched": "维护良好阅览秩序",
+      "similarity": 0.4748271703720093,
+      "weight": 0.9,
+      "w_sim": 0.42734445333480836,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "六、自习座位 阅览室大概有100000个座位",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.47409504652023315,
+      "weight": 0.9,
+      "w_sim": 0.42668554186820984,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "高峰期可能要等一会儿",
+      "matched": "逾期将产生滞纳金",
+      "similarity": 0.46500837802886963,
+      "weight": 0.9,
+      "w_sim": 0.4185075402259827,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "高峰期可能要等一会儿",
+      "matched": "请于规定时限内归还",
+      "similarity": 0.45513033866882324,
+      "weight": 1.0,
+      "w_sim": 0.45513033866882324,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "强烈推荐大家来",
+      "matched": "欢迎广大师生使用",
+      "similarity": 0.49164697527885437,
+      "weight": 1.0,
+      "w_sim": 0.49164697527885437,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "七、温馨提示 请保持安静",
+      "matched": "请勿在馆内大声喧哗",
+      "similarity": 0.46252375841140747,
+      "weight": 0.8,
+      "w_sim": 0.370019006729126,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "别打扰别人看书就OK了",
+      "matched": "如有疑问请联系图书馆工作人员",
+      "similarity": 0.5106895565986633,
+      "weight": 0.9,
+      "w_sim": 0.45962060093879703,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "别打扰别人看书就OK了",
+      "matched": "请遵守借阅规则",
+      "similarity": 0.498650461435318,
+      "weight": 1.0,
+      "w_sim": 0.498650461435318,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "规范表达参考",
+      "sentence": "别打扰别人看书就OK了",
+      "matched": "请勿在馆内大声喧哗",
+      "similarity": 0.46961647272109985,
+      "weight": 0.8,
+      "w_sim": 0.3756931781768799,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "提升读者服务体验",
+      "similarity": 0.5227150917053223,
+      "weight": 0.8,
+      "w_sim": 0.4181720733642578,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.4788423776626587,
+      "weight": 1.0,
+      "w_sim": 0.4788423776626587,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "图书馆借阅服务指南 一、开放时间 图书馆超级早就开门啦",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.4706219732761383,
+      "weight": 1.0,
+      "w_sim": 0.4706219732761383,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "提升读者服务体验",
+      "similarity": 0.527779757976532,
+      "weight": 0.8,
+      "w_sim": 0.4222238063812256,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "根据相关规定",
+      "similarity": 0.4856223464012146,
+      "weight": 0.9,
+      "w_sim": 0.43706011176109316,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "二、借阅规则 普通读者证每次最多可以借100本书",
+      "matched": "依据法律法规",
+      "similarity": 0.48042309284210205,
+      "weight": 1.0,
+      "w_sim": 0.48042309284210205,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "期刊数据库随便用",
+      "matched": "遵守数据库商协议规定",
+      "similarity": 0.5055950284004211,
+      "weight": 1.0,
+      "w_sim": 0.5055950284004211,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "期刊数据库随便用",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.4921940863132477,
+      "weight": 1.0,
+      "w_sim": 0.4921940863132477,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "期刊数据库随便用",
+      "matched": "校园网环境下凭账号登录访问",
+      "similarity": 0.4500408172607422,
+      "weight": 1.0,
+      "w_sim": 0.4500408172607422,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、证件办理 办证需要带身份证",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.5094424486160278,
+      "weight": 0.9,
+      "w_sim": 0.45849820375442507,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、证件办理 办证需要带身份证",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.4812397062778473,
+      "weight": 1.0,
+      "w_sim": 0.4812397062778473,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "三、证件办理 办证需要带身份证",
+      "matched": "根据相关规定",
+      "similarity": 0.4723794460296631,
+      "weight": 0.9,
+      "w_sim": 0.42514150142669677,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "学生证也行",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.5093609094619751,
+      "weight": 0.9,
+      "w_sim": 0.4584248185157776,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "学生证也行",
+      "matched": "保障师生合法权益",
+      "similarity": 0.5065203905105591,
+      "weight": 1.0,
+      "w_sim": 0.5065203905105591,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "学生证也行",
+      "matched": "根据相关规定",
+      "similarity": 0.4766026437282562,
+      "weight": 0.9,
+      "w_sim": 0.4289423793554306,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "不过听说有时候不用交",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.47913259267807007,
+      "weight": 1.0,
+      "w_sim": 0.47913259267807007,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "去问问工作人员就行了",
+      "matched": "请各部门遵照执行",
+      "similarity": 0.5016696453094482,
+      "weight": 0.9,
+      "w_sim": 0.4515026807785034,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "去问问工作人员就行了",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.4952836036682129,
+      "weight": 1.0,
+      "w_sim": 0.4952836036682129,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "去问问工作人员就行了",
+      "matched": "申请提交后将由相关部门审核",
+      "similarity": 0.490628182888031,
+      "weight": 1.0,
+      "w_sim": 0.490628182888031,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "联系电话：13800138000",
+      "matched": "持续优化服务质量",
+      "similarity": 0.4539235830307007,
+      "weight": 0.8,
+      "w_sim": 0.36313886642456056,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "联系电话：13800138000",
+      "matched": "特此通知",
+      "similarity": 0.4508935511112213,
+      "weight": 1.0,
+      "w_sim": 0.4508935511112213,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "或者打0431 1234567也可以",
+      "matched": "根据相关规定",
+      "similarity": 0.45349937677383423,
+      "weight": 0.9,
+      "w_sim": 0.4081494390964508,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "四、还书与罚款 超期还书要交滞纳金",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.49186110496520996,
+      "weight": 0.9,
+      "w_sim": 0.44267499446868896,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "超期太久的话可能要赔偿书价",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.5025644302368164,
+      "weight": 0.9,
+      "w_sim": 0.45230798721313475,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "一般赔500块左右",
+      "matched": "按照相关协议合理使用",
+      "similarity": 0.46248316764831543,
+      "weight": 1.0,
+      "w_sim": 0.46248316764831543,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "一般赔500块左右",
+      "matched": "根据相关规定",
+      "similarity": 0.45036447048187256,
+      "weight": 0.9,
+      "w_sim": 0.4053280234336853,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "严重的赔个几千块也有可能",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.502615749835968,
+      "weight": 0.9,
+      "w_sim": 0.4523541748523712,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "反正别超期就对了",
+      "matched": "如有违反将依规处理",
+      "similarity": 0.5049183368682861,
+      "weight": 0.9,
+      "w_sim": 0.45442650318145755,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "文献保障率100",
+      "matched": "文献检索与学术研究",
+      "similarity": 0.5400135517120361,
+      "weight": 1.0,
+      "w_sim": 0.5400135517120361,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "文献保障率100",
+      "matched": "保障师生合法权益",
+      "similarity": 0.46158772706985474,
+      "weight": 1.0,
+      "w_sim": 0.46158772706985474,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "文献保障率100",
+      "matched": "知识产权保护",
+      "similarity": 0.4567502737045288,
+      "weight": 1.0,
+      "w_sim": 0.4567502737045288,
+      "db_role": "whitelist"
+    },
+    {
+      "category": "学术正式用语",
+      "sentence": "别打扰别人看书就OK了",
+      "matched": "提升读者服务体验",
+      "similarity": 0.48326563835144043,
+      "weight": 0.8,
+      "w_sim": 0.3866125106811524,
+      "db_role": "whitelist"
+    }
+  ],
+  "monte_carlo": {
+    "mean": 0.35506291720394445,
+    "median": 0.3543802469059198,
+    "std": 0.09774656126838356,
+    "ci_95": [
+      0.17148204680972234,
+      0.5508203965514008
+    ],
+    "n_simulations": 0,
+    "pass_threshold": 0.82,
+    "review_threshold": 0.6,
+    "pass_probability": 0.0,
+    "review_probability": 0.007,
+    "reject_probability": 0.993,
+    "decision": "建议人工复核",
+    "action": "REVIEW",
+    "reason": "事实核查分 0.000 < 0.95，存在事实性问题，需人工核实",
+    "trigger": "hard_review",
+    "score_distribution": {}
+  }
+}
